@@ -1,4 +1,4 @@
-from flask import render_template, redirect, request, url_for, g, session
+from flask import render_template, redirect, request, url_for, g, session, jsonify
 from flask_openid import OpenID
 from app import app
 
@@ -9,6 +9,7 @@ import time
 from datetime import datetime
 
 from .user import get_or_create
+from .table import TableBuilder
 from db import Database
 from config import ITEMS_COLLECTION, USERS_COLLECTION, SUBSCRIPTION_TIME_FORMAT, EXCHANGER_API_KEY
 from constants import Platform, Game, fee, steam_id_re
@@ -17,12 +18,195 @@ from constants import Platform, Game, fee, steam_id_re
 logger = logging.getLogger(__name__)
 db = Database()
 oid = OpenID(app, '/tmp', safe_roots=[])
+table_builder = TableBuilder()
 
 
 @app.route('/')
 @app.route('/index')
 def index():
     return redirect('/dota')
+
+@app.route('/get_table')
+def get_table():
+    data = []
+    games = [game.name for game in Game]
+    platforms = [platform.name for platform in Platform]
+    first_platform = request.args.get('first_platform', '')
+    second_platform = request.args.get('second_platform', '')
+    first_min_price = request.args.get('first_min_price', '')
+    first_max_price = request.args.get('first_max_price', '')
+    first_min_diff = request.args.get('first_min_diff', '')
+    first_max_diff = request.args.get('first_max_diff', '')
+    first_min_volume = request.args.get('first_min_volume', '')
+    first_max_volume = request.args.get('first_max_volume', '')
+    first_autobuy = request.args.get('first_autobuy', 'false')
+    second_min_price = request.args.get('second_min_price', '')
+    second_max_price = request.args.get('second_max_price', '')
+    second_min_diff = request.args.get('second_min_diff', '')
+    second_max_diff = request.args.get('second_max_diff', '')
+    second_min_volume = request.args.get('second_min_volume', '')
+    second_max_volume = request.args.get('second_max_volume', '')
+    second_autobuy = request.args.get('second_autobuy', 'false')
+    subscribed = g.user is not None and g.user['subscribed']
+    game = request.args.get('game', '')
+    if game in games and first_platform in platforms and second_platform in platforms:
+        for record in db.find(ITEMS_COLLECTION, {'game': game, first_platform: {'$exists': True}, second_platform: {'$exists': True}}, multiple=True):
+            try:
+                item = {}
+                item['name'] = record[Platform.STEAM.name]['name']
+                platforms_ = []
+                for platform in platforms:
+                    if platform in record:
+                        try:
+                            platform_ = {
+                                'name': platform,
+                                'logo': f'/static/images/{platform}_logo.png',
+                                'url': record[platform]['url']
+                            }
+                            if 'volume' in record[platform]:
+                                platform_['volume'] = record[platform]['volume']
+                            platforms_.append(platform_)
+                        except:
+                            pass
+                # намного быстрее, чем render_template
+                item['platforms'] = '''<div class="platforms">'''
+                for platform in platforms_:
+                    item['platforms'] += f'''<a href="{platform['url']}" class="ui image" data-platform="{platform['name']}"'''
+                    if 'volume' in platform:
+                        item['platforms'] += f''' data-tooltip="{platform['volume']} продаж" data-inverted><div class="floating ui black label mini">{platform['volume']}</div'''
+                    item['platforms'] += f'''><img src="{platform['logo']}" style="width: 24px;"></a>'''
+                item['platforms'] += '''</div>'''
+                for idx, platform in enumerate([first_platform, second_platform]):
+                    price = ['first_price', 'second_price'][idx]
+                    volume = ['first_volume', 'second_volume'][idx]
+                    autobuy = True if [first_autobuy, second_autobuy][idx] == 'true' else False
+                    if platform == Platform.C5GAME.name:
+                        if not autobuy:
+                            item[price] = record[platform]['lowest_sell_order']['usd']
+                        else:
+                            raise Exception("Автопокупка не доступна для платформы")
+                    elif platform == Platform.STEAM.name:
+                        if not autobuy:
+                            item[price] = record[platform]['lowest_sell_order']
+                        else:
+                            item[price] = record[platform]['highest_buy_order']
+                        if 'volume' in record[platform]:
+                            item[volume] = record[platform]['volume']
+                item['first_diff'] = round((item['second_price'] / fee[second_platform][game] / item['first_price'] - 1) * 100, 2)
+                item['second_diff'] = round((item['first_price'] / fee[first_platform][game] / item['second_price'] - 1) * 100, 2)
+                if not subscribed:
+                    if item['first_price'] > 1.0 or item['second_price'] > 1.0:
+                        continue
+                if first_min_price:
+                    try:
+                        first_min_price = float(first_min_price)
+                        if item['first_price'] < first_min_price:
+                            continue
+                    except ValueError:
+                        pass
+                if first_max_price:
+                    try:
+                        first_max_price = float(first_max_price)
+                        if item['first_price'] > first_max_price:
+                            continue
+                    except ValueError:
+                        pass
+                if first_min_diff:
+                    try:
+                        first_min_diff = float(first_min_diff)
+                        if item['first_diff'] < first_min_diff:
+                            continue
+                    except ValueError:
+                        pass
+                if first_max_diff:
+                    try:
+                        first_max_diff = float(first_max_diff)
+                        if item['first_diff'] > first_max_diff:
+                            continue
+                    except ValueError:
+                        pass
+                if first_min_volume:
+                    try:
+                        first_min_volume = int(first_min_volume)
+                        if 'first_volume' in item:
+                            volume = item['first_volume']
+                        else:
+                            volume = 0
+                        if volume < first_min_volume:
+                            continue
+                    except ValueError:
+                        pass
+                if first_max_volume:
+                    try:
+                        first_max_volume = int(first_max_volume)
+                        if 'first_volume' in item:
+                            volume = item['first_volume']
+                        else:
+                            volume = 0
+                        if volume > first_max_volume:
+                            continue
+                    except ValueError:
+                        pass
+                if second_min_price:
+                    try:
+                        second_min_price = float(second_min_price)
+                        if item['second_price'] < second_min_price:
+                            continue
+                    except ValueError:
+                        pass
+                if second_max_price:
+                    try:
+                        second_max_price = float(second_max_price)
+                        if item['second_price'] > second_max_price:
+                            continue
+                    except ValueError:
+                        pass
+                if second_min_diff:
+                    try:
+                        second_min_diff = float(second_min_diff)
+                        if item['second_diff'] < second_min_diff:
+                            continue
+                    except ValueError:
+                        pass
+                if second_max_diff:
+                    try:
+                        second_max_diff = float(second_max_diff)
+                        if item['second_diff'] > second_max_diff:
+                            continue
+                    except ValueError:
+                        pass
+                if second_min_volume:
+                    try:
+                        second_min_volume = int(second_min_volume)
+                        if 'second_volume' in item:
+                            volume = item['second_volume']
+                        else:
+                            volume = 0
+                        if volume < second_min_volume:
+                            continue
+                    except ValueError:
+                        pass
+                if second_max_volume:
+                    try:
+                        second_max_volume = int(second_max_volume)
+                        if 'second_volume' in item:
+                            volume = item['second_volume']
+                        else:
+                            volume = 0
+                        if volume > second_max_volume:
+                            continue
+                    except ValueError:
+                        pass
+                for price in ['first_price', 'second_price']:
+                    item[price] = str(item[price]) + '$'
+                for diff in ['first_diff', 'second_diff']:
+                    item[diff] = str(item[diff]) + '%'
+                data.append(item)
+            except Exception as e:
+                pass
+
+    data = table_builder.collect_data_serverside(request, data)
+    return jsonify(data)
 
 @app.route('/dota')
 @app.route('/csgo')
@@ -46,54 +230,13 @@ def table():
         game = Game.STEAM.name
     elif request.path == '/payday2':
         game = Game.PAYDAY2.name
-    first_platform = request.args.get('first_platform', Platform.C5GAME.name)
-    second_platform = request.args.get('second_platform', Platform.STEAM.name)
-    subscribed = g.user is not None and g.user['subscribed']
+    
     platforms = {}
     for platform in Platform:
         platforms[platform.name] = {
-            'name': platform.name,
-            'logo': f'/static/images/{platform.name}_logo.png',
-            'short': platform.name[:2]
+            'name': platform.name
         }
-    for platform in [first_platform, second_platform]:
-        if platform not in platforms:
-            raise Exception(f"Неизвестная платформа: {platform}")
-    items = []
-    for item in db.find(ITEMS_COLLECTION, {'game': game, first_platform: { '$exists': True },  second_platform: { '$exists': True }}, multiple=True):
-        try:
-            nitem = {}
-            nitem['name'] = item[Platform.STEAM.name]['name']
-            for platform in platforms:
-                if platform in item:
-                    try:
-                        nitem_platform = {}
-
-                        if platform == Platform.C5GAME.name:
-                            nitem_platform['price'] = item[platform]['lowest_sell_order']['usd']
-                        
-                        elif platform == Platform.STEAM.name:
-                            nitem_platform['price'] = item[platform]['lowest_sell_order']
-                            if 'volume' in item[platform]:
-                                nitem_platform['volume'] = item[platform]['volume']
-                        
-                        nitem_platform['url'] = item[platform]['url']
-                        nitem_platform['updated_at'] = item[platform]['updated_at']
-                        nitem[platform] = nitem_platform
-                    except:
-                        pass
-
-            if not subscribed:
-                if nitem[first_platform]['price'] > 1.0 or nitem[second_platform]['price'] > 1.0:
-                    raise Exception("Для получения предмета требуется подписка")
-
-            nitem[first_platform]['diff'] = round((nitem[second_platform]['price'] / fee[second_platform][game] / nitem[first_platform]['price'] - 1) * 100, 2)
-            nitem[second_platform]['diff'] = round((nitem[first_platform]['price'] / fee[first_platform][game] / nitem[second_platform]['price'] - 1) * 100, 2)
-            items.append(nitem)
-        except:
-            pass
-
-    return render_template('table.html', first_platform=first_platform, second_platform=second_platform, platforms=platforms, items=items)
+    return render_template('table.html', game=game, platforms=platforms)
 
 @app.route('/account')
 def account():

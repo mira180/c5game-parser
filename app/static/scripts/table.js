@@ -1,79 +1,44 @@
-$.fn.dataTable.ext.search.push(
-  function(settings, data, dataIndex) {
-    var first_min_price = parseFloat($('#filter .first.min.price').val());
-    var first_max_price = parseFloat($('#filter .first.max.price').val());
-    var first_min_diff = parseFloat($('#filter .first.min.diff').val());
-    var first_max_diff = parseFloat($('#filter .first.max.diff').val());
-    var first_min_volume = parseInt($('#filter .first.min.volume').val(), 10);
-    var first_max_volume = parseInt($('#filter .first.max.volume').val(), 10);
-    var second_min_price = parseFloat($('#filter .second.min.price').val());
-    var second_max_price = parseFloat($('#filter .second.max.price').val());
-    var second_min_diff = parseFloat($('#filter .second.min.diff').val());
-    var second_max_diff = parseFloat($('#filter .second.max.diff').val());
-    var second_min_volume = parseInt($('#filter .second.min.volume').val(), 10);
-    var second_max_volume = parseInt($('#filter .second.max.volume').val(), 10);
-    var first_price = parseFloat(data[2]) || 0;
-    var second_price = parseFloat(data[3]) || 0;
-    var first_volume = parseInt(data[4], 10) || 0;
-    var second_volume = parseInt(data[5], 10) || 0;
-    var first_diff = parseFloat(data[6]) || 0;
-    var second_diff = parseFloat(data[7]) || 0;
-    if (!isNaN(first_min_price) && first_price < first_min_price) {
-      return false
-    }
-    if (!isNaN(first_max_price) && first_price > first_max_price) {
-      return false
-    }
-    if (!isNaN(first_min_diff) && first_diff < first_min_diff) {
-      return false
-    }
-    if (!isNaN(first_max_diff) && first_diff > first_max_diff) {
-      return false
-    }
-    if (!isNaN(first_min_volume) && first_volume < first_min_volume) {
-      return false
-    }
-    if (!isNaN(first_max_volume) && first_volume > first_max_volume) {
-      return false
-    }
-    if (!isNaN(second_min_price) && second_price < second_min_price) {
-      return false
-    }
-    if (!isNaN(second_max_price) && second_price > second_max_price) {
-      return false
-    }
-    if (!isNaN(second_min_diff) && second_diff < second_min_diff) {
-      return false
-    }
-    if (!isNaN(second_max_diff) && second_diff > second_max_diff) {
-      return false
-    }
-    if (!isNaN(second_min_volume) && second_volume < second_min_volume) {
-      return false
-    }
-    if (!isNaN(second_max_volume) && second_volume > second_max_volume) {
-      return false
-    }
-    return true
-  }
-);
+var short_names = {
+  'C5GAME': 'C5',
+  'STEAM': 'ST',
+};
 
 $.fn.DataTable.ext.pager.numbers_length = 5;
 
 $(function(){
 
   var table = $('#table').DataTable({
-    pageLength: 100,
-    columnDefs: [
-      {
-        targets: 1,
-        orderable: false,
-        searchable: false,
-      },
-      {
-        targets: [4, 5],
-        visible: false,
-      }
+    bProcessing: true,
+    bServerSide: true,
+    lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+    sAjaxSource: '/get_table',
+    fnServerParams: function ( aoData ) {
+      aoData.push( { "name": "first_platform", "value": $('#filter .first.platform').val() },
+                   { "name": "second_platform", "value": $('#filter .second.platform').val() },
+                   { "name": "first_min_price", "value": $('#filter .first.min.price').val() },
+                   { "name": "first_max_price", "value": $('#filter .first.max.price').val() },
+                   { "name": "first_min_diff", "value": $('#filter .first.min.diff').val() },
+                   { "name": "first_max_diff", "value": $('#filter .first.max.diff').val() },
+                   { "name": "first_min_volume", "value": $('#filter .first.min.volume').val() },
+                   { "name": "first_max_volume", "value": $('#filter .first.max.volume').val() },
+                   { "name": "first_autobuy", "value": $('#filter .first.autobuy').is(':checked') },
+                   { "name": "second_min_price", "value": $('#filter .second.min.price').val() },
+                   { "name": "second_max_price", "value": $('#filter .second.max.price').val() },
+                   { "name": "second_min_diff", "value": $('#filter .second.min.diff').val() },
+                   { "name": "second_max_diff", "value": $('#filter .second.max.diff').val() },
+                   { "name": "second_min_volume", "value": $('#filter .second.min.volume').val() },
+                   { "name": "second_max_volume", "value": $('#filter .second.max.volume').val() },
+                   { "name": "second_autobuy", "value": $('#filter .second.autobuy').is(':checked') },
+                   { "name": "game", "value": $('#table').data('game') }
+                   )
+    },   
+    columns: [
+      {"data": "Название предмета"},
+      {"data": "Платформы"},
+      {"data": "Первая цена", "title": short_names[$('#filter .first.platform').val()]},
+      {"data": "Вторая цена", "title": short_names[$('#filter .second.platform').val()]},
+      {"data": "Первая разница", "title": short_names[$('#filter .first.platform').val()] + '->' + short_names[$('#filter .second.platform').val()]},
+      {"data": "Вторая разница", "title": short_names[$('#filter .second.platform').val()] + '->' + short_names[$('#filter .first.platform').val()]},
     ],
     language: {
       emptyTable: "Нет данных в таблице",
@@ -100,13 +65,22 @@ $(function(){
       $('.ui.sticky')
         .sticky('refresh')
       ;
-    },
+    }
   });
-
-  $('#wait_message').addClass('hidden');
 
   $('#filter .first, #filter .second').keyup(function() {
-    table.draw();
+    $('#filter .row.apply').show();
+    //table.draw();
   });
+
+  $('#filter .first.platform, #filter .second.platform, #filter .first.autobuy, #filter .second.autobuy').change(function() {
+    $('#filter .row.apply').show();
+    //table.draw();
+  })
+
+  $('#filter .row.apply button').click(function() {
+    table.draw();
+    $('#filter .row.apply').hide();
+  })
 
 })
