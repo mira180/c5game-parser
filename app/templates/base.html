@@ -1,0 +1,289 @@
+<!doctype html>
+<html>
+  <head>
+    <!-- Semantic UI -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/dataTables.semanticui.min.css">
+    <!-- All -->
+    <link rel="stylesheet" href="static/styles/all.css">
+    <link rel="icon" type="image/x-icon" href="static/images/icon.png">
+    <title>C5GAME Parser</title>
+  </head>
+  <body class="pushable">
+    <div class="ui vertical inverted sidebar menu left" id="toc">
+      <div class="item">
+        <a class="ui logo icon image" href="/">
+          <img src="/static/images/logo.png">
+        </a>
+        <a href="/">
+          <b>C5GAME Parser</b>
+        </a>
+      </div>
+      <a class="item" href="/faq">
+        <b>Инструкция</b>
+      </a>
+      <a class="item" href="/updates">
+        <b>Новости обновлений</b>
+      </a>
+      <div class="item">
+        <div class="header">Выбор игры</div>
+        <div class="menu">
+            <a class="item{% if request.path == '/dota' %} active{% endif %}" href="/dota">
+              Dota 2
+            </a>
+            <a class="item{% if request.path == '/csgo' %} active{% endif %}" href="/csgo">
+              CS:GO
+            </a>
+            <a class="item{% if request.path == '/tf2' %} active{% endif %}" href="/tf2">
+              Team Fortress 2
+            </a>
+            <a class="item{% if request.path == '/z1' %} active{% endif %}" href="/z1">
+              Z1 Battle Royale
+            </a>
+            <a class="item{% if request.path == '/rust' %} active{% endif %}" href="/rust">
+              Rust
+            </a>
+            <a class="item{% if request.path == '/steam' %} active{% endif %}" href="/steam">
+              Steam
+            </a>
+            <a class="item{% if request.path == '/payday2' %} active{% endif %}" href="/payday2">
+              Payday 2
+            </a>
+        </div>
+      </div>
+      <div class="item">
+        <div class="header">Аккаунт</div>
+        <div class="menu">
+          {% if g.user is not none %}
+          <div class="item">
+            <a class="ui logo icon image" href="{{ g.user.profile }}">
+              <img src="{{ g.user.avatar }}">
+            </a>
+            <a href="{{ g.user.profile }}" style="color: rgba(255,255,255,.9);">
+              <b>{{ g.user.name }}</b>
+            </a>
+          </div>
+          <a class="item" href="/account">
+            Настройки подписки
+          </a>
+          <a class="item" href="/logout">
+            Выйти
+          </a>
+          {% else %}
+          <a class="item ui image" href="/login">
+            <img src="/static/images/signinthroughsteam.png">
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="ui fixed inverted main menu">
+      <div class="ui container" id="open_sidebar">
+        <a class="launch icon item">
+          <i class="content icon"></i>
+        </a>
+        <div class="item">
+          C5GAME Parser
+        </div>
+      </div>
+    </div>
+    <div class="pusher">
+      <div class="full height">
+        <div class="toc">
+          <div class="ui vertical menu inverted">
+            <div class="item">
+              <a class="ui logo icon image" href="/">
+                <img src="/static/images/logo.png">
+              </a>
+              <a href="/">
+                <b>C5GAME Parser</b>
+              </a>
+            </div>
+            <a class="item" href="/faq">
+              <b>Инструкция</b>
+            </a>
+            <a class="item" href="/updates">
+              <b>Новости обновлений</b>
+            </a>
+            <div class="item">
+              <div class="header">Выбор игры</div>
+              <div class="menu">
+                  <a class="item{% if request.path == '/dota' %} active{% endif %}" href="/dota">
+                    Dota 2
+                  </a>
+                  <a class="item{% if request.path == '/csgo' %} active{% endif %}" href="/csgo">
+                    CS:GO
+                  </a>
+                  <a class="item{% if request.path == '/tf2' %} active{% endif %}" href="/tf2">
+                    Team Fortress 2
+                  </a>
+                  <a class="item{% if request.path == '/z1' %} active{% endif %}" href="/z1">
+                    Z1 Battle Royale
+                  </a>
+                  <a class="item{% if request.path == '/rust' %} active{% endif %}" href="/rust">
+                    Rust
+                  </a>
+                  <a class="item{% if request.path == '/steam' %} active{% endif %}" href="/steam">
+                    Steam
+                  </a>
+                  <a class="item{% if request.path == '/payday2' %} active{% endif %}" href="/payday2">
+                    Payday 2
+                  </a>
+              </div>
+            </div>
+            <div class="item">
+              <div class="header">Аккаунт</div>
+              <div class="menu">
+                {% if g.user is not none %}
+                <div class="item">
+                  <a class="ui logo icon image" href="{{ g.user.profile }}">
+                    <img src="{{ g.user.avatar }}">
+                  </a>
+                  <a href="{{ g.user.profile }}" style="color: rgba(255,255,255,.9);">
+                    <b>{{ g.user.name }}</b>
+                  </a>
+                </div>
+                <a class="item" href="/account">
+                  Настройки подписки
+                </a>
+                <a class="item" href="/logout">
+                  Выйти
+                </a>
+                {% else %}
+                <a class="item" href="/login">
+                  <a class="item ui image" href="/login">
+                    <img src="/static/images/signinthroughsteam.png">
+                  </a>
+                </a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="article">
+          <div class="ui masthead vertical segment">
+            <div class="ui container">
+              <div class="introduction">
+                <h1 class="ui header inverted">
+                  C5GAME PARSER
+                  <div class="sub header">
+                    Обновляемая таблица цен для платформы C5GAME.COM
+                  </div>
+                </h1>
+              </div>
+            </div>
+          </div>
+          <div class="main ui intro container">
+            <div class="ui dividing right rail">
+              <div class="ui sticky">
+                <div class="ui accordion">
+                  <div class="title active">
+                    <i class="dropdown icon"></i>
+                    <b>Конвертер валют</b>
+                  </div>
+                  <div class="content active">
+                    <div class="ui centered grid" id="converter">
+                      <div class="row equal width column">
+                        <div class="column">
+                          <div class="ui input fluid">
+                            <input type="text" value="1" class="converter_value first">
+                          </div>
+                        </div>
+                        <div class="column">
+                          <div class="ui selection dropdown fluid">
+                            <input type="hidden" name="currency" value="USD" class="converter_currency first">
+                            <i class="dropdown icon"></i>
+                            <div class="text">USD</div>
+                            <div class="menu">
+                              <div class="item active selected" data-value="USD">USD</div>
+                              <div class="item" data-value="RUB">RUB</div>
+                              <div class="item" data-value="EUR">EUR</div>
+                              <div class="item" data-value="CNY">CNY</div>
+                              <div class="item" data-value="GBP">GBP</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row equal width column">
+                        <div class="column">
+                          <div class="ui input fluid">
+                            <input type="text" class="converter_value second">
+                          </div>
+                        </div>
+                        <div class="column">
+                          <div class="ui selection dropdown fluid">
+                            <input type="hidden" name="currency" value="RUB" class="converter_currency second">
+                            <i class="dropdown icon"></i>
+                            <div class="text">RUB</div>
+                            <div class="menu">
+                              <div class="item" data-value="USD">USD</div>
+                              <div class="item active selected" data-value="RUB">RUB</div>
+                              <div class="item" data-value="EUR">EUR</div>
+                              <div class="item" data-value="CNY">CNY</div>
+                              <div class="item" data-value="GBP">GBP</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="title active">
+                    <i class="dropdown icon"></i>
+                    <b>Выбор игры</b>
+                  </div>
+                  <div class="content active">
+                    <a href="/dota" class="ui image rounded{% if request.path == '/dota' %} active{% endif %}">
+                      <img src="/static/images/DOTA_cover.png">
+                    </a>
+                    <a href="/csgo" class="ui image rounded{% if request.path == '/csgo' %} active{% endif %}">
+                      <img src="/static/images/CSGO_cover.png">
+                    </a>
+                    <a href="/tf2" class="ui image rounded{% if request.path == '/tf2' %} active{% endif %}">
+                      <img src="/static/images/TF2_cover.png">
+                    </a>
+                    <a href="/z1" class="ui image rounded{% if request.path == '/z1' %} active{% endif %}">
+                      <img src="/static/images/Z1_cover.png">
+                    </a>
+                    <a href="/rust" class="ui image rounded{% if request.path == '/rust' %} active{% endif %}">
+                      <img src="/static/images/RUST_cover.png">
+                    </a>
+                    <a href="/steam" class="ui image rounded{% if request.path == '/steam' %} active{% endif %}">
+                      <img src="/static/images/STEAM_cover.png">
+                    </a>
+                    <a href="/payday2" class="ui image rounded{% if request.path == '/payday2' %} active{% endif %}">
+                      <img src="/static/images/PAYDAY2_cover.png">
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% block main %} {% endblock %}
+          </div>
+          <div class="ui vertical footer segment">
+            <div class="ui center aligned container">
+              <img src="/static/images/logo.png" class="ui centered mini image">
+              <div class="ui horizontal small divided link list">
+                <a class="item" href="/" target="_blank">Parser :)</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- JQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Semantic UI -->
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+    <!-- DataTables -->
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.js"></script>
+    <!-- DataTables -->
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.3/js/dataTables.semanticui.min.js"></script>
+    <!-- All -->
+    <script src="static/scripts/all.js"></script>
+    <!-- Converter -->
+    <script src="static/scripts/converter.js"></script>
+    <!-- Table -->
+    <script src="static/scripts/table.js"></script>
+  </body>
+</html>

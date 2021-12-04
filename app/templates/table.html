@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block main %}
+  <h2 class="ui dividing header">Таблица</h2>
+  <div class="ui stackable grid middle aligned" id="filter">
+    <div class="row five column">
+      <div class="column">
+        <div class="ui selection dropdown fluid">
+          <input type="hidden" value="{{ first_platform }}" class="first platform">
+          <i class="dropdown icon"></i>
+          <div class="text">{{ platforms[first_platform]['name'] }}</div>
+          <div class="menu">
+            {% for name, platform in platforms.items() %}
+              <div class="item{% if name == first_platform %} active selected{% endif %}" data-value="{{ name }}">{{ platform['name'] }}</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="ui input fluid">
+          <input type="text" placeholder="Мин. цена" class="first min price">
+        </div>
+      </div>
+      <div class="column">
+        <div class="ui input fluid">
+          <input type="text" placeholder="Макс. цена" class="first max price">
+        </div>
+      </div>
+      <div class="column">
+        <div class="ui input fluid">
+          <input type="text" placeholder="Мин. разница" class="first min diff">
+        </div>
+      </div>
+      <div class="column">
+        <div class="ui input fluid">
+          <input type="text" placeholder="Макс. разница" class="first max diff">
+        </div>
+      </div>
+    </div>
+    <div class="row five column">
+      <div class="column">
+        <div class="ui input fluid">
+          <input type="text" placeholder="Мин. продаж" class="first min volume">
+        </div>
+      </div>
+      <div class="column">
+        <div class="ui input fluid">
+          <input type="text" placeholder="Макс. продаж" class="first max volume">
+        </div>
+      </div>
+      <div class="column center aligned">
+        <div class="ui checkbox">
+          <input type="checkbox" class="first autobuy">
+          <label>Автопокупка</label>
+        </div>
+      </div>
+    </div>
+    <div class="row five column">
+      <div class="column">
+        <div class="ui selection dropdown fluid">
+          <input type="hidden" value="{{ second_platform }}" class="second platform">
+          <i class="dropdown icon"></i>
+          <div class="text">{{ platforms[second_platform]['name'] }}</div>
+          <div class="menu">
+            {% for name, platform in platforms.items() %}
+              <div class="item{% if name == second_platform %} active selected{% endif %}" data-value="{{ name }}">{{ platform['name'] }}</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="ui input fluid">
+          <input type="text" placeholder="Мин. цена" class="second min price">
+        </div>
+      </div>
+      <div class="column">
+        <div class="ui input fluid">
+          <input type="text" placeholder="Макс. цена" class="second max price">
+        </div>
+      </div>
+      <div class="column">
+        <div class="ui input fluid">
+          <input type="text" placeholder="Мин. разница" class="second min diff">
+        </div>
+      </div>
+      <div class="column">
+        <div class="ui input fluid">
+          <input type="text" placeholder="Макс. разница" class="second max diff">
+        </div>
+      </div>
+    </div>
+    <div class="row five column">
+      <div class="column">
+        <div class="ui input fluid">
+          <input type="text" placeholder="Мин. продаж" class="second min volume">
+        </div>
+      </div>
+      <div class="column">
+        <div class="ui input fluid">
+          <input type="text" placeholder="Макс. продаж" class="second max volume">
+        </div>
+      </div>
+      <div class="column center aligned">
+        <div class="ui checkbox">
+          <input type="checkbox" class="second autobuy">
+          <label>Автопокупка</label>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% if g.user is not none and g.user.subscribed %}
+  <div class="ui positive message">
+    <div class="header">
+      Подписка оформлена
+    </div>
+    <p>Теперь у вас есть доступ ко всем предметам :)</p>
+  </div>
+  {% else %}
+  <div class="ui negative message">
+    <div class="header">
+      Подписка не оформлена
+    </div>
+    <p>Чтобы получить доступ к предметам стоимостью > 1$, нужно <a href="/account" style="color: inherit; text-decoration: underline;">оформить подписку</a> :(</p>
+  </div>
+  {% endif %}
+  <div class="ui icon message" id="wait_message">
+    <i class="notched circle loading icon"></i>
+    <div class="content">
+      <div class="header">
+        Всего одну минуту
+      </div>
+      <p>Загрузка таблицы может занять некоторое время, которое зависит от производительности вашего компьютера</p>
+    </div>
+  </div>
+  <table class="ui celled table" id="table">
+    <thead>
+      <tr><th class="center aligned">Предмет</th>
+      <th class="center aligned">Платформы</th>
+      <th class="center aligned">{{ platforms[first_platform]['short'] }}</th>
+      <th class="center aligned">{{ platforms[second_platform]['short'] }}</th>
+      <th class="center aligned">{{ platforms[first_platform]['short'] }} (volume)</th>
+      <th class="center aligned">{{ platforms[second_platform]['short'] }} (volume)</th>
+      <th class="center aligned">{{ platforms[first_platform]['short'] }}->{{ platforms[second_platform]['short'] }}</th>
+      <th class="center aligned">{{ platforms[second_platform]['short'] }}->{{ platforms[first_platform]['short'] }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+        <tr>
+          <td data-label="name" class="center aligned">{{ item['name'] }}</td>
+          <td data-label="platforms" class="center aligned">
+            <div class="platforms">
+              {% for name, platform in platforms.items() %}
+                {% if name in item %}
+                <a href="{{ item[name]['url'] }}" class="ui image" data-platform="{{ name }}"{% if 'volume' in item[name] %} data-tooltip="{{ item[name]['volume'] }} продаж" data-inverted{% endif %}>
+                  {% if 'volume' in item[name] %}
+                    <div class="floating ui black label mini">{{ item[name]['volume'] }}</div>
+                  {% endif %}
+                  <img src="{{ platform['logo'] }}" style="width: 24px;">
+                </a>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </td>
+          <td data-label="{{ first_platform }}" class="center aligned">
+            <div data-tooltip="{{ item[first_platform]['updated_at'] }}" data-inverted>{{ item[first_platform]['price'] }}$</div>
+          </td>
+          <td data-label="{{ second_platform }}" class="center aligned">
+            <div data-tooltip="{{ item[second_platform]['updated_at'] }}" data-inverted>{{ item[second_platform]['price'] }}$</div>
+          </td>
+          <td data-label="{{ first_platform }} (volume)" class="center aligned">{{ item[first_platform]['volume'] }}</td>
+          <td data-label="{{ second_platform }} (volume)" class="center aligned">{{ item[second_platform]['volume'] }}</td>
+          <td data-label="{{ first_platform }}_{{ second_platform }}" class="center aligned">{{ item[first_platform]['diff'] }}%</td>
+          <td data-label="{{ second_platform }}_{{ first_platform }}" class="center aligned">{{ item[second_platform]['diff'] }}%</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

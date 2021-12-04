@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+<div class="ui negative message">
+    <div class="header">
+      Ошибка
+    </div>
+    {% if error == 404 %}
+    <p>
+        Страница не найдена
+    </p>
+    {% elif error == 500 %}
+    <p>
+        Произошла внутренняя ошибка сервера
+    </p>
+    {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,7 @@
+proxy.txt
+.env
+.flaskenv
+/db
+/webdriver
+venv/
+__pycache__/
