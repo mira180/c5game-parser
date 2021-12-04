@@ -1,4 +1,5 @@
 proxy.txt
+secret.txt
 *.crt
 *.key
 .env
