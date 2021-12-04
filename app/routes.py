@@ -300,6 +300,28 @@ def logout():
     session.pop('steam_id', None)
     return redirect('/')
 
+@app.route('/payment/result')
+def payment_result():
+    merchant_id = request.args.get('MERCHANT_ID')
+    amount = request.args.get('AMOUNT')
+    intid = request.args.get('intid')
+    merchant_order_id = request.args.get('MERCHANT_ORDER_ID')
+    p_email = request.args.get('P_EMAIL')
+    p_phone = request.args.get('P_PHONE')
+    cur_id = request.args.get('CUR_ID')
+    sign = request.args.get('SIGN')
+    us_key = request.args.get('us_key')
+    print(f'{merchant_id}, {amount}, {intid}, {merchant_order_id}, {p_email}, {p_phone}, {cur_id}, {sign}, {us_key}')
+    return 'OK'
+
+@app.route('/payment/success')
+def payment_success():
+    redirect('/')
+
+@app.route('/payment/failed')
+def payment_failed():
+    redirect('/')
+
 @app.errorhandler(404)
 def page_not_found(e):
     logger.warning(f'404 - пользователь попытался перейти на несуществующую страницу: {request.path}')
