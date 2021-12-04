@@ -311,16 +311,16 @@ def payment_result():
     cur_id = request.args.get('CUR_ID')
     sign = request.args.get('SIGN')
     us_key = request.args.get('us_key')
-    print(f'{merchant_id}, {amount}, {intid}, {merchant_order_id}, {p_email}, {p_phone}, {cur_id}, {sign}, {us_key}')
+    logger.info(f'{merchant_id}, {amount}, {intid}, {merchant_order_id}, {p_email}, {p_phone}, {cur_id}, {sign}, {us_key}')
     return 'OK'
 
 @app.route('/payment/success')
 def payment_success():
-    redirect('/')
+    return redirect('/')
 
 @app.route('/payment/failed')
 def payment_failed():
-    redirect('/')
+    return redirect('/')
 
 @app.errorhandler(404)
 def page_not_found(e):
