@@ -79,6 +79,7 @@ def get_table():
                 for idx, platform in enumerate([first_platform, second_platform]):
                     price = ['first_price', 'second_price'][idx]
                     volume = ['first_volume', 'second_volume'][idx]
+                    updated = ['first_updated', 'second_updated'][idx]
                     autobuy = True if [first_autobuy, second_autobuy][idx] == 'true' else False
                     if platform == Platform.C5GAME.name:
                         if not autobuy:
@@ -92,6 +93,7 @@ def get_table():
                             item[price] = record[platform]['highest_buy_order']
                         if 'volume' in record[platform]:
                             item[volume] = record[platform]['volume']
+                    item[updated] = record[platform]['updated_at']
                 item['first_diff'] = round((item['second_price'] / fee[second_platform][game] / item['first_price'] - 1) * 100, 2)
                 item['second_diff'] = round((item['first_price'] / fee[first_platform][game] / item['second_price'] - 1) * 100, 2)
                 if not subscribed:
@@ -197,8 +199,8 @@ def get_table():
                             continue
                     except ValueError:
                         pass
-                for price in ['first_price', 'second_price']:
-                    item[price] = str(item[price]) + '$'
+                for (price, updated) in zip(['first_price', 'second_price'], ['first_updated', 'second_updated']):
+                    item[price] = f'''<div data-tooltip="{item[updated]}" data-inverted>{item[price]}$</div>'''
                 for diff in ['first_diff', 'second_diff']:
                     item[diff] = str(item[diff]) + '%'
                 data.append(item)

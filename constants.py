@@ -35,4 +35,5 @@ fee = {
     }
 }
 
-steam_id_re = re.compile('steamcommunity.com\/openid\/id\/(\d+)$')
+steam_id_re = re.compile(r'steamcommunity.com\/openid\/id\/(\d+)$')
+price_re = re.compile(r'<div[^>]*>([\d\.\$]+)</div>')

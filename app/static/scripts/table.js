@@ -35,10 +35,10 @@ $(function(){
     columns: [
       {"data": "Название предмета"},
       {"data": "Платформы"},
-      {"data": "Первая цена", "title": short_names[$('#filter .first.platform').val()]},
-      {"data": "Вторая цена", "title": short_names[$('#filter .second.platform').val()]},
-      {"data": "Первая разница", "title": short_names[$('#filter .first.platform').val()] + '->' + short_names[$('#filter .second.platform').val()]},
-      {"data": "Вторая разница", "title": short_names[$('#filter .second.platform').val()] + '->' + short_names[$('#filter .first.platform').val()]},
+      {"data": "Первая цена"},
+      {"data": "Вторая цена"},
+      {"data": "Первая разница"},
+      {"data": "Вторая разница"},
     ],
     language: {
       emptyTable: "Нет данных в таблице",
@@ -62,6 +62,10 @@ $(function(){
       }
     },
     drawCallback: function() {
+      $(table.column(2).header()).text(short_names[$('#filter .first.platform').val()])
+      $(table.column(3).header()).text(short_names[$('#filter .second.platform').val()])
+      $(table.column(4).header()).text(short_names[$('#filter .first.platform').val()] + '->' + short_names[$('#filter .second.platform').val()])
+      $(table.column(5).header()).text(short_names[$('#filter .second.platform').val()] + '->' + short_names[$('#filter .first.platform').val()])
       $('.ui.sticky')
         .sticky('refresh')
       ;

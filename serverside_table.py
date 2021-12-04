@@ -1,5 +1,5 @@
 import re
-
+from constants import price_re
 
 class ServerSideTable(object):
     '''
@@ -114,7 +114,7 @@ class ServerSideTable(object):
                 sort_direction = self.request_values['sSortDir_' + str(i)]
                 if column_name == "Первая цена" or column_name == "Вторая цена":
                     data = sorted(data,
-                                key=lambda x: float(x[column_name].replace('$', '')),
+                                key=lambda x: float(price_re.search(x[column_name]).group(1).replace('$', '')),
                                 reverse=is_reverse(sort_direction))
                 elif column_name == "Первая разница" or column_name == "Вторая разница":
                     data = sorted(data,
