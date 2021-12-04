@@ -1,4 +1,6 @@
 proxy.txt
+*.crt
+*.key
 .env
 .flaskenv
 /db

@@ -1,6 +1,9 @@
 import logging
 import os
 from sys import platform
+from dotenv import load_dotenv
+
+load_dotenv('.env')
 
 logging.getLogger('urllib3').setLevel('CRITICAL')
 logging.getLogger('selenium').setLevel('CRITICAL')
