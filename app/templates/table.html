@@ -113,7 +113,7 @@
       </div>
     </div>
   </div>
-  {% if g.user is not none and g.user.subscribed %}
+  {% if current_user.subscribed %}
   <div class="ui positive message">
     <div class="header">
       Подписка оформлена
@@ -125,7 +125,7 @@
     <div class="header">
       Подписка не оформлена
     </div>
-    <p>Чтобы получить доступ к предметам стоимостью > 1$, нужно <a href="/account" style="color: inherit; text-decoration: underline;">оформить подписку</a> :(</p>
+    <p>Чтобы получить доступ к предметам стоимостью > 1$, нужно <a href="{{ url_for('main.account') }}" class="link">оформить подписку</a> :(</p>
   </div>
   {% endif %}
   <table class="ui celled table center aligned" id="table" data-game="{{ game }}">

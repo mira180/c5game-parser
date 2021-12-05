@@ -13,10 +13,10 @@
   <body class="pushable">
     <div class="ui vertical inverted sidebar menu left" id="toc">
       <div class="item">
-        <a class="ui logo icon image" href="/">
+        <a class="ui logo icon image" href="{{ url_for('main.index') }}">
           <img src="/static/images/logo.png">
         </a>
-        <a href="/">
+        <a href="{{ url_for('main.index') }}">
           <b>C5GAME Parser</b>
         </a>
       </div>
@@ -55,24 +55,24 @@
       <div class="item">
         <div class="header">Аккаунт</div>
         <div class="menu">
-          {% if g.user is not none %}
-          <div class="item">
-            <a class="ui logo icon image" href="{{ g.user.profile }}">
-              <img src="{{ g.user.avatar }}">
-            </a>
-            <a href="{{ g.user.profile }}" style="color: rgba(255,255,255,.9);">
-              <b>{{ g.user.name }}</b>
-            </a>
-          </div>
-          <a class="item" href="/account">
-            Настройки подписки
-          </a>
-          <a class="item" href="/logout">
-            Выйти
+          {% if current_user.is_anonymous %}
+          <a class="item ui image" href="{{ url_for('auth.login') }}">
+            <img src="/static/images/signinthroughsteam.png">
           </a>
           {% else %}
-          <a class="item ui image" href="/login">
-            <img src="/static/images/signinthroughsteam.png">
+          <div class="item">
+            <a class="ui logo icon image" href="{{ current_user.profile }}">
+              <img src="{{ current_user.avatar }}">
+            </a>
+            <a href="{{ current_user.profile }}" style="color: rgba(255,255,255,.9);">
+              <b>{{ current_user.name }}</b>
+            </a>
+          </div>
+          <a class="item" href="{{ url_for('main.account') }}">
+            Настройки подписки
+          </a>
+          <a class="item" href="{{ url_for('auth.logout') }}">
+            Выйти
           </a>
           {% endif %}
         </div>
@@ -93,10 +93,10 @@
         <div class="toc">
           <div class="ui vertical menu inverted">
             <div class="item">
-              <a class="ui logo icon image" href="/">
+              <a class="ui logo icon image" href="{{ url_for('main.index') }}">
                 <img src="/static/images/logo.png">
               </a>
-              <a href="/">
+              <a href="{{ url_for('main.index') }}">
                 <b>C5GAME Parser</b>
               </a>
             </div>
@@ -135,26 +135,24 @@
             <div class="item">
               <div class="header">Аккаунт</div>
               <div class="menu">
-                {% if g.user is not none %}
-                <div class="item">
-                  <a class="ui logo icon image" href="{{ g.user.profile }}">
-                    <img src="{{ g.user.avatar }}">
-                  </a>
-                  <a href="{{ g.user.profile }}" style="color: rgba(255,255,255,.9);">
-                    <b>{{ g.user.name }}</b>
-                  </a>
-                </div>
-                <a class="item" href="/account">
-                  Настройки подписки
-                </a>
-                <a class="item" href="/logout">
-                  Выйти
+                {% if current_user.is_anonymous %}
+                <a class="item ui image" href="{{ url_for('auth.login') }}">
+                  <img src="/static/images/signinthroughsteam.png">
                 </a>
                 {% else %}
-                <a class="item" href="/login">
-                  <a class="item ui image" href="/login">
-                    <img src="/static/images/signinthroughsteam.png">
+                <div class="item">
+                  <a class="ui logo icon image" href="{{ current_user.profile }}">
+                    <img src="{{ current_user.avatar }}">
                   </a>
+                  <a href="{{ current_user.profile }}" style="color: rgba(255,255,255,.9);">
+                    <b>{{ current_user.name }}</b>
+                  </a>
+                </div>
+                <a class="item" href="{{ url_for('main.account') }}">
+                  Настройки подписки
+                </a>
+                <a class="item" href="{{ url_for('auth.logout') }}">
+                  Выйти
                 </a>
                 {% endif %}
               </div>
@@ -264,7 +262,7 @@
             <div class="ui center aligned container">
               <img src="/static/images/logo.png" class="ui centered mini image">
               <div class="ui horizontal small divided link list">
-                <a class="item" href="/" target="_blank">Parser :)</a>
+                <a class="item" href="{{ url_for('main.index') }}" target="_blank">Parser :)</a>
               </div>
             </div>
           </div>

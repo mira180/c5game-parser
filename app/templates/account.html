@@ -8,15 +8,15 @@
         <div class="ui grid center aligned">
           <div class="row">
             <div class="column">
-              <a href="{{ g.user.profile }}" class="profile picture">
-                <img class="ui centered image" src="{{ g.user.avatar }}">
+              <a href="{{ current_user.profile }}" class="profile picture">
+                <img class="ui centered image" src="{{ current_user.avatar }}">
               </a>
             </div>
           </div>
           <div class="row">
             <div class="column">
-              <a href="{{ g.user.profile }}" class="ui header" style="overflow-wrap: break-word;">
-                {{ g.user.name }}
+              <a href="{{ current_user.profile }}" class="ui header" style="overflow-wrap: break-word;">
+                {{ current_user.name }}
               </a>
             </div>
           </div>
@@ -24,7 +24,7 @@
       </div>
       <div class="column twelve wide">
         <div class="ui accordion">
-          {% if g.user.subscribed %}
+          {% if current_user.subscribed %}
             <div class="title active">
               <i class="dropdown icon"></i>
               <b>Информация о подписке</b>
@@ -37,7 +37,7 @@
                       <b>Действует</b>
                     </div>
                     <div class="column right aligned">
-                      {% if g.user.subscribed %}
+                      {% if current_user.subscribed %}
                         <b>Да</b>
                       {% else %}
                         <b>Нет</b>
@@ -49,8 +49,8 @@
                       <b>Дата окончания</b>
                     </div>
                     <div class="column right aligned">
-                        {% if g.user.subscribed %}
-                          <b>{{ g.user.subscription_expires }}</b>
+                        {% if current_user.subscribed %}
+                          <b>{{ current_user.subscription_expires }}</b>
                         {% else %}
                           <b>-</b>
                         {% endif %}
@@ -61,7 +61,7 @@
                       <b>Владелец</b>
                     </div>
                     <div class="column right aligned">
-                      <b>{{ g.user.name }}</b>
+                      <b>{{ current_user.name }}</b>
                     </div>
                   </div>
                 </div>
@@ -70,7 +70,7 @@
           {% endif %}
           <div class="title active">
             <i class="dropdown icon"></i>
-            {% if g.user.subscribed %}
+            {% if current_user.subscribed %}
               <b>Продлить подписку</b>
             {% else %}
               <b>Оформить подписку</b>
@@ -83,7 +83,7 @@
               </div>
               <p>После нажатия кнопки «Оформить» вы будете перенаправлены на сайт платежного сервиса FreeKassa.ru. Доступны все самые распространенные способы оплаты. Подписка будет начислена на аккаунт сразу по завершении оплаты.</p>
             </div>
-            <div class="ui segment" id="order">
+            <form class="ui segment" id="payment" data-price="{{ subscription_price }}" action="{{ url_for('payment.make') }}" method="get">
               <div class="ui grid middle aligned">
                 <div class="row">
                   <div class="column six wide left aligned">
@@ -91,7 +91,7 @@
                   </div>
                   <div class="column three wide right floated right aligned">
                     <div class="ui input fluid">
-                      <input style="text-align: center" type="text" value="1" id="months" maxlength="3">
+                      <input style="text-align: center" type="text" value="1" class="months" name="months" maxlength="3">
                     </div>
                   </div>
                 </div>
@@ -100,13 +100,13 @@
                     <b>Итого</b>
                   </div>
                   <div class="column three wide right floated center aligned">
-                    <b id="sum">5$</b>
+                    <b class="sum">5$</b>
                   </div>
                 </div>
                 <div class="row">
                   <div class="column sixteen wide right aligned">
-                    <button class="ui button fluid yellow">
-                      {% if g.user.subscribed %}
+                    <button type="submit" class="ui button fluid yellow">
+                      {% if current_user.subscribed %}
                         Продлить
                       {% else %}
                         Оформить
@@ -115,7 +115,7 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       </div>

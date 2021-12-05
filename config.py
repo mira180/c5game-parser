@@ -12,8 +12,9 @@ logging.basicConfig(
         format="%(asctime)s [%(levelname)s]: %(message)s",
         datefmt="%H:%M:%S")
 
+DATE_FORMAT = os.getenv('DATE_FORMAT', r'%Y-%m-%d %H:%M:%S')
+SUBSCRIPTION_PRICE = float(os.getenv('SUBSCRIPTION_PRICE', '5.0'))
 UPDATED_TIME_FORMAT = os.getenv('UPDATED_TIME_FORMAT', r'%Y-%m-%d %H:%M:%S')
-SUBSCRIPTION_TIME_FORMAT = os.getenv('SUBSCRIPTION_TIME_FORMAT', r'%d.%m.%Y')
 ITEMS_COLLECTION = os.getenv('ITEMS_COLLECTION', 'items')
 USERS_COLLECTION = os.getenv('USERS_COLLECTION', 'users')
 PROXY_FILE = os.getenv('PROXY_FILE', 'proxy.txt')
@@ -29,3 +30,8 @@ elif platform == 'linux':
 class FlaskConfig(object):
     SECRET_KEY = os.getenv('SECRET_KEY', '`\xc8d*J(@\xbc/t\x12\x8ei\x06^\xeb^\xd0\xbb\xd2y\xa7\x99E')
     TEMPLATES_AUTO_RELOAD = True
+    MONGODB_SETTINGS = {
+        'db': 'c5game_parser',
+        'host': 'localhost',
+        'port': 27017
+    }

@@ -1,6 +1,8 @@
-from flask import render_template, redirect, request, url_for, g, session, jsonify
-from flask_openid import OpenID
-from app import app
+from flask import render_template, redirect, request, g, jsonify
+from flask_login import login_required, current_user
+from app.main import bp
+from app.main.table import TableBuilder
+from app.main.conversion import ConversionRates
 
 import json
 import requests
@@ -8,25 +10,23 @@ import logging
 import time
 from datetime import datetime
 
-from .user import get_or_create
-from .table import TableBuilder
 from db import Database
-from config import ITEMS_COLLECTION, USERS_COLLECTION, SUBSCRIPTION_TIME_FORMAT, EXCHANGER_API_KEY
-from constants import Platform, Game, fee, steam_id_re
+from config import ITEMS_COLLECTION, EXCHANGER_API_KEY, SUBSCRIPTION_PRICE
+from constants import Platform, Game, fee
 
 
 logger = logging.getLogger(__name__)
-db = Database()
-oid = OpenID(app, '/tmp', safe_roots=[])
 table_builder = TableBuilder()
+conversion_rates = ConversionRates(EXCHANGER_API_KEY)
+db = Database()
 
 
-@app.route('/')
-@app.route('/index')
+@bp.route('/')
+@bp.route('/index')
 def index():
     return redirect('/dota')
 
-@app.route('/get_table')
+@bp.route('/get_table')
 def get_table():
     data = []
     games = [game.name for game in Game]
@@ -47,7 +47,7 @@ def get_table():
     second_min_volume = request.args.get('second_min_volume', '')
     second_max_volume = request.args.get('second_max_volume', '')
     second_autobuy = request.args.get('second_autobuy', 'false')
-    subscribed = g.user is not None and g.user['subscribed']
+    subscribed = not current_user.is_anonymous
     game = request.args.get('game', '')
     if game in games and first_platform in platforms and second_platform in platforms:
         for record in db.find(ITEMS_COLLECTION, {'game': game, first_platform: {'$exists': True}, second_platform: {'$exists': True}}, multiple=True):
@@ -210,13 +210,13 @@ def get_table():
     data = table_builder.collect_data_serverside(request, data)
     return jsonify(data)
 
-@app.route('/dota')
-@app.route('/csgo')
-@app.route('/tf2')
-@app.route('/z1')
-@app.route('/rust')
-@app.route('/steam')
-@app.route('/payday2')
+@bp.route('/dota')
+@bp.route('/csgo')
+@bp.route('/tf2')
+@bp.route('/z1')
+@bp.route('/rust')
+@bp.route('/steam')
+@bp.route('/payday2')
 def table():
     if request.path == '/dota':
         game = Game.DOTA.name
@@ -240,94 +240,11 @@ def table():
         }
     return render_template('table.html', game=game, platforms=platforms)
 
-@app.route('/account')
+@bp.route('/account')
+@login_required
 def account():
-    if g.user is not None:
-        return render_template('account.html')
-    else:
-        return redirect('/login')
+    return render_template('account.html', subscription_price=SUBSCRIPTION_PRICE)
 
-@app.route('/get_conversion_rates')
+@bp.route('/get_conversion_rates')
 def get_conversion_rates():
-    try:
-        with open('latest.txt', 'r') as lf:
-            latest = json.loads(lf.read())
-        if time.time() - latest['updated_at'] > 86400:
-            try:
-                logger.info('Обновляем курсы валют')
-                latest_ = requests.get('https://v6.exchangerate-api.com/v6/{EXCHANGER_API_KEY}/latest/USD').json()
-                if latest_['result'] == 'success':
-                    latest['updated_at'] = latest_['time_last_update_unix']
-                    latest['base_code'] = latest_['base_code']
-                    latest['conversion_rates'] = latest_['conversion_rates']
-                    with open('latest.txt', 'w') as lf:
-                        lf.write(json.dumps(latest))
-                else:
-                    raise Exception(f'Запрос к API вернул статус: {latest_["result"]}')
-            except Exception as e:
-                logger.error(f'Ошибка получения курсов валют по API: {e}')
-        return latest
-    except Exception as e:
-        logger.error(f'Ошибка во время получения курсов валют: {e}')
-        return {}, 500
-
-@app.before_request
-def before_request():
-    g.user = None
-    if 'steam_id' in session:
-        g.user = db.find(USERS_COLLECTION, {'steam_id': session['steam_id']})
-        if g.user['subscribed'] and datetime.strptime(g.user['subscription_expires'], SUBSCRIPTION_TIME_FORMAT) < datetime.now():
-            g.user['subscribed'] = False
-            db.update(USERS_COLLECTION, {'steam_id': session['steam_id']}, {'subscribed': False})
-
-@app.route('/login')
-@oid.loginhandler
-def login_steam():
-    if g.user is not None:
-        return redirect(oid.get_next_url())
-    else:
-        return oid.try_login('https://steamcommunity.com/openid')
-
-@oid.after_login
-def new_steam_user(resp):
-    steam_id = int(steam_id_re.search(resp.identity_url).group(1))
-    g.user = get_or_create(db, steam_id)
-    session['steam_id'] = steam_id
-    return redirect(oid.get_next_url())
-
-@app.route('/logout')
-def logout():
-    session.pop('steam_id', None)
-    return redirect('/')
-
-@app.route('/payment/result')
-def payment_result():
-    merchant_id = request.args.get('MERCHANT_ID')
-    amount = request.args.get('AMOUNT')
-    intid = request.args.get('intid')
-    merchant_order_id = request.args.get('MERCHANT_ORDER_ID')
-    p_email = request.args.get('P_EMAIL')
-    p_phone = request.args.get('P_PHONE')
-    cur_id = request.args.get('CUR_ID')
-    sign = request.args.get('SIGN')
-    us_key = request.args.get('us_key')
-    logger.info(f'{merchant_id}, {amount}, {intid}, {merchant_order_id}, {p_email}, {p_phone}, {cur_id}, {sign}, {us_key}')
-    return 'OK'
-
-@app.route('/payment/success')
-def payment_success():
-    return redirect('/')
-
-@app.route('/payment/failed')
-def payment_failed():
-    return redirect('/')
-
-@app.errorhandler(404)
-def page_not_found(e):
-    logger.warning(f'404 - пользователь попытался перейти на несуществующую страницу: {request.path}')
-    return render_template('error.html', error=404), 404
-
-@app.errorhandler(500)
-def internal_server_error(e):
-    logger.warning(f'500 - произошла ошибка сервера по адресу: {request.path}')
-    return render_template('error.html', error=500), 500
+    return conversion_rates.get()
