@@ -9,7 +9,6 @@ class User(UserMixin, db.Document):
     subscribed = db.BooleanField(default=False)
     expires = db.StringField()
     registered = db.StringField()
-    last_login = db.StringField()
     last_seen = db.StringField()
 
 @login.user_loader

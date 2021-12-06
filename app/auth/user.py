@@ -14,7 +14,6 @@ def create_user(steam_id: int):
 
 def update_user(steam_id: int):
     user = User.objects(steam_id=steam_id).first()
-    user.update(last_login=datetime.utcnow().strftime(DATE_FORMAT))
     try:
         steam = requests.get(f"http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={STEAM_API_KEY}&steamids={steam_id}").json()['response']['players'][0]
         user.update(profile=steam['profileurl'], avatar=steam['avatarfull'], name=steam['personaname'])

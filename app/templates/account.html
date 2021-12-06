@@ -50,7 +50,7 @@
                     </div>
                     <div class="column right aligned">
                         {% if current_user.subscribed %}
-                          <b>{{ current_user.subscription_expires }}</b>
+                          <b>{{ current_user.expires }}</b>
                         {% else %}
                           <b>-</b>
                         {% endif %}

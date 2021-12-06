@@ -50,7 +50,7 @@ def result():
     if not order or order.amount != amount or order.status != 'PROCESS':
         logger.warning(f'ошибка заказа {merchant_order_id}')
         abort(400)
-    user = User.objects(steam_id=order.steam_id)
+    user = User.objects(steam_id=order.steam_id).first()
     months = order.amount / current_app.config['PRICE_PER_MONTH']
     if user.subscribed and user.expires:
         expires = (datetime.strptime(user.expires, current_app.config['DATE_FORMAT']) + timedelta(days=30 * months)).strftime(current_app.config['DATE_FORMAT'])
