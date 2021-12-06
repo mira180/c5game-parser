@@ -51,7 +51,7 @@ def get_table():
     second_min_volume = request.args.get('second_min_volume', '')
     second_max_volume = request.args.get('second_max_volume', '')
     second_autobuy = request.args.get('second_autobuy', 'false')
-    subscribed = current_user.subscribed
+    subscribed = current_user.is_authenticated and current_user.subscribed
     game = request.args.get('game', '')
     if game in games and first_platform in platforms and second_platform in platforms:
         for record in db.find(ITEMS_COLLECTION, {'game': game, first_platform: {'$exists': True}, second_platform: {'$exists': True}}, multiple=True):
