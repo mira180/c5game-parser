@@ -29,9 +29,8 @@ def make():
 @bp.route('/result')
 def result():
     client_ip = get_client_ip(request)
-    logger.info(client_ip)
     if client_ip not in current_app.config['MERCHANT_ALLOWED_IP_ADDRESSES']:
-        logger.info('не разрешенный ip')
+        logger.warning(f'Не разрешенный ip {client_ip}')
         abort(403)
     merchant_id = request.args.get('MERCHANT_ID', type=int)
     format_float = lambda f: f if f % 1 else int(f)
@@ -42,13 +41,13 @@ def result():
     p_phone = request.args.get('P_PHONE')
     cur_id = request.args.get('CUR_ID', type=int)
     sign = request.args.get('SIGN')
-    payer_account = request.args.get('PAYER_ACCOUNT')
+    payer_account = request.args.get('payer_account')
     if sign != md5(f"{current_app.config['MERCHANT_ID']}:{amount}:{current_app.config['MERCHANT_SECRET_2']}:{merchant_order_id}".encode('utf-8')).hexdigest():
-        logger.warning(f'ошибка подписи {sign}')
+        logger.error(f'Ошибка подписи {sign}')
         abort(400)
     order = Order.objects(order_id=merchant_order_id).first()
     if not order or order.amount != amount or order.status != 'PROCESS':
-        logger.warning(f'ошибка заказа {merchant_order_id}')
+        logger.error(f'Ошибка заказа {merchant_order_id}')
         abort(400)
     user = User.objects(steam_id=order.steam_id).first()
     months = order.amount / current_app.config['PRICE_PER_MONTH']
