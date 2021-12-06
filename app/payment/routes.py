@@ -1,4 +1,4 @@
-from flask import redirect, request, current_app, abort
+from flask import redirect, request, current_app, abort, render_template
 from flask_login import current_user, login_required
 from app.payment import bp
 from app.models import Order, User
@@ -61,8 +61,8 @@ def result():
 
 @bp.route('/success')
 def success():
-    return 'SUCCESS'
+    return render_template('payment/success.html')
 
 @bp.route('/failed')
 def failed():
-    return 'FAILED'
+    return render_template('payment/failed.html')

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+<div class="ui positive message">
+    <div class="header">Успешная оплата</div>
+    <p>Посмотреть статус подписки можно в <a href="{{ url_for('main.account') }}" class="link">личном кабинете</a>. В случае проблем с подпиской обращайтесь на admin@c5game-parser.ru.</p>
+</div>
+
+{% endblock %}

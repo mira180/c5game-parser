@@ -8,7 +8,7 @@
         <div class="ui selection dropdown fluid">
           <input type="hidden" value="C5GAME" class="first platform">
           <i class="dropdown icon"></i>
-          <div class="text">platforms['C5GAME']['name']</div>
+          <div class="text"></div>
           <div class="menu">
             {% for name, platform in platforms.items() %}
               <div class="item{% if name == 'C5GAME' %} active selected{% endif %}" data-value="{{ name }}">{{ platform['name'] }}</div>
@@ -60,7 +60,7 @@
         <div class="ui selection dropdown fluid">
           <input type="hidden" value="STEAM" class="second platform">
           <i class="dropdown icon"></i>
-          <div class="text">platforms['STEAM']['name']</div>
+          <div class="text"></div>
           <div class="menu">
             {% for name, platform in platforms.items() %}
               <div class="item{% if name == 'STEAM' %} active selected{% endif %}" data-value="{{ name }}">{{ platform['name'] }}</div>
