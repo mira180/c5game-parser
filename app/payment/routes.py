@@ -28,7 +28,7 @@ def make():
 
 @bp.route('/result')
 def result():
-    client_ip = get_client_ip()
+    client_ip = get_client_ip(request)
     logger.info(client_ip)
     if client_ip not in current_app.config['MERCHANT_ALLOWED_IP_ADDRESSES']:
         logger.info('не разрешенный ip')
