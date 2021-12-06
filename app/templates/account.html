@@ -83,7 +83,7 @@
               </div>
               <p>После нажатия кнопки «Оформить» вы будете перенаправлены на сайт платежного сервиса FreeKassa.ru. Доступны все самые распространенные способы оплаты. Подписка будет начислена на аккаунт сразу по завершении оплаты.</p>
             </div>
-            <form class="ui segment" id="payment" data-price="{{ subscription_price }}" action="{{ url_for('payment.make') }}" method="get">
+            <form class="ui segment" id="payment" action="{{ url_for('payment.make') }}" method="get">
               <div class="ui grid middle aligned">
                 <div class="row">
                   <div class="column six wide left aligned">

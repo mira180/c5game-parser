@@ -7,18 +7,6 @@ from app.auth.user import create_user, update_user
 from constants import steam_id_re
 
 
-"""
-@bp.before_request
-def before_request():
-    g.user = None
-    if 'steam_id' in session:
-        g.user = db.find(USERS_COLLECTION, {'steam_id': session['steam_id']})
-        if g.user['subscribed'] and datetime.strptime(g.user['subscription_expires'], SUBSCRIPTION_TIME_FORMAT) < datetime.now():
-            g.user['subscribed'] = False
-            db.update(USERS_COLLECTION, {'steam_id': session['steam_id']}, {'subscribed': False})
-"""
-
-
 @bp.route('/login')
 @oid.loginhandler
 def login():

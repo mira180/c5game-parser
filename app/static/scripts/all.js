@@ -37,7 +37,7 @@ $(function(){
     });
 
     $('#payment .months').keyup(function (event) {
-      $('#payment .sum').text($(this).val() * $('#payment').data('price') + '$')
+      $('#payment .sum').text($(this).val() * 5.0 + '$')
     });
 
 });

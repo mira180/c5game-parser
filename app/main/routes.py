@@ -1,17 +1,13 @@
-from flask import render_template, redirect, request, g, jsonify
+from flask import render_template, redirect, request, jsonify
 from flask_login import login_required, current_user
 from app.main import bp
 from app.main.table import TableBuilder
 from app.main.conversion import ConversionRates
 
-import json
-import requests
 import logging
-import time
 from datetime import datetime
-
 from db import Database
-from config import ITEMS_COLLECTION, EXCHANGER_API_KEY, SUBSCRIPTION_PRICE
+from config import ITEMS_COLLECTION, EXCHANGER_API_KEY, DATE_FORMAT
 from constants import Platform, Game, fee
 
 
@@ -20,6 +16,14 @@ table_builder = TableBuilder()
 conversion_rates = ConversionRates(EXCHANGER_API_KEY)
 db = Database()
 
+
+@bp.before_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.utcnow().strftime(DATE_FORMAT)
+        if current_user.subscribed and datetime.strptime(current_user.expires, DATE_FORMAT) < datetime.utcnow():
+            current_user.subscribed = False
+        current_user.save()
 
 @bp.route('/')
 @bp.route('/index')
@@ -47,7 +51,7 @@ def get_table():
     second_min_volume = request.args.get('second_min_volume', '')
     second_max_volume = request.args.get('second_max_volume', '')
     second_autobuy = request.args.get('second_autobuy', 'false')
-    subscribed = not current_user.is_anonymous
+    subscribed = current_user.subscribed
     game = request.args.get('game', '')
     if game in games and first_platform in platforms and second_platform in platforms:
         for record in db.find(ITEMS_COLLECTION, {'game': game, first_platform: {'$exists': True}, second_platform: {'$exists': True}}, multiple=True):
@@ -243,7 +247,7 @@ def table():
 @bp.route('/account')
 @login_required
 def account():
-    return render_template('account.html', subscription_price=SUBSCRIPTION_PRICE)
+    return render_template('account.html')
 
 @bp.route('/get_conversion_rates')
 def get_conversion_rates():

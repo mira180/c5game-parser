@@ -13,7 +13,6 @@ logging.basicConfig(
         datefmt="%H:%M:%S")
 
 DATE_FORMAT = os.getenv('DATE_FORMAT', r'%Y-%m-%d %H:%M:%S')
-SUBSCRIPTION_PRICE = float(os.getenv('SUBSCRIPTION_PRICE', '5.0'))
 UPDATED_TIME_FORMAT = os.getenv('UPDATED_TIME_FORMAT', r'%Y-%m-%d %H:%M:%S')
 ITEMS_COLLECTION = os.getenv('ITEMS_COLLECTION', 'items')
 USERS_COLLECTION = os.getenv('USERS_COLLECTION', 'users')
@@ -35,3 +34,8 @@ class FlaskConfig(object):
         'host': 'localhost',
         'port': 27017
     }
+    MERCHANT_ID = int(os.getenv('MERCHANT_ID'))
+    MERCHANT_SECRET_1 = os.getenv('MERCHANT_SECRET_1')
+    MERCHANT_SECRET_2 = os.getenv('MERCHANT_SECRET_2')
+    PRICE_PER_MONTH = float(os.getenv('PRICE_PER_MONTH'))
+    PRICE_CURRENCY = os.getenv('PRICE_CURRENCY')

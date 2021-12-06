@@ -10,6 +10,7 @@ class User(UserMixin, db.Document):
     expires = db.StringField()
     registered = db.StringField()
     last_login = db.StringField()
+    last_seen = db.StringField()
 
 @login.user_loader
 def load_user(id):
