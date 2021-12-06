@@ -28,6 +28,7 @@ def make():
 
 @bp.route('/result')
 def result():
+    logger.info(request.remote_addr)
     if request.remote_addr not in current_app.config['MERCHANT_ALLOWED_IP_ADDRESSES']:
         logger.info('не разрешенный ip')
         abort(403)
