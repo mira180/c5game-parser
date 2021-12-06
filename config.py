@@ -2,6 +2,7 @@ import logging
 import os
 from sys import platform
 from dotenv import load_dotenv
+import json
 
 load_dotenv('.env')
 
@@ -39,3 +40,4 @@ class FlaskConfig(object):
     MERCHANT_SECRET_2 = os.getenv('MERCHANT_SECRET_2')
     PRICE_PER_MONTH = float(os.getenv('PRICE_PER_MONTH'))
     PRICE_CURRENCY = os.getenv('PRICE_CURRENCY')
+    MERCHANT_ALLOWED_IP_ADDRESSES = json.loads(os.getenv('MERCHANT_ALLOWED_IP_ADDRESSES'))

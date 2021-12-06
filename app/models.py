@@ -28,3 +28,17 @@ class Platform(db.EmbeddedDocument):
 class Item(db.Document):
     steam = db.EmbeddedDocumentField(Platform)
     c5game = db.EmbeddedDocumentField(Platform)
+
+class Order(db.Document):
+    order_id = db.SequenceField()
+    steam_id = db.IntField()
+    status = db.StringField()
+    amount = db.FloatField()
+    currency = db.StringField()
+    created = db.StringField()
+    merchant_id = db.IntField()
+    operation_id = db.IntField()
+    email = db.StringField()
+    phone = db.StringField()
+    currency_id = db.IntField()
+    payer_account = db.StringField()
