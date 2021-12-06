@@ -41,3 +41,4 @@ class FlaskConfig(object):
     PRICE_PER_MONTH = float(os.getenv('PRICE_PER_MONTH'))
     PRICE_CURRENCY = os.getenv('PRICE_CURRENCY')
     MERCHANT_ALLOWED_IP_ADDRESSES = json.loads(os.getenv('MERCHANT_ALLOWED_IP_ADDRESSES'))
+    DATE_FORMAT = os.getenv('DATE_FORMAT', r'%Y-%m-%d %H:%M:%S')

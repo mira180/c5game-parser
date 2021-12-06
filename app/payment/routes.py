@@ -6,7 +6,7 @@ from hashlib import md5
 from urllib.parse import urlencode
 import logging
 from datetime import datetime, timedelta
-from config import DATE_FORMAT
+from app.payment.client import get_client_ip
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ def make():
     format_float = lambda f: f if f % 1 else int(f)
     oa = format_float(months * current_app.config['PRICE_PER_MONTH'])
     currency = current_app.config['PRICE_CURRENCY']
-    order = Order(steam_id=current_user.steam_id, status='PROCESS', amount=oa, currency=currency, created=datetime.utcnow().strftime(DATE_FORMAT))
+    order = Order(steam_id=current_user.steam_id, status='PROCESS', amount=oa, currency=currency, created=datetime.utcnow().strftime(current_app.config['DATE_FORMAT']))
     o = order.order_id
     order.save()
     s = md5(f"{m}:{oa}:{current_app.config['MERCHANT_SECRET_1']}:{currency}:{o}".encode('utf-8')).hexdigest()
@@ -28,8 +28,9 @@ def make():
 
 @bp.route('/result')
 def result():
-    logger.info(request.remote_addr)
-    if request.remote_addr not in current_app.config['MERCHANT_ALLOWED_IP_ADDRESSES']:
+    client_ip = get_client_ip()
+    logger.info(client_ip)
+    if client_ip not in current_app.config['MERCHANT_ALLOWED_IP_ADDRESSES']:
         logger.info('не разрешенный ip')
         abort(403)
     merchant_id = request.args.get('MERCHANT_ID', type=int)
@@ -51,9 +52,9 @@ def result():
     user = User.objects(steam_id=order.steam_id)
     months = order.amount / current_app.config['PRICE_PER_MONTH']
     if user.subscribed and user.expires:
-        expires = (datetime.strptime(user.expires, DATE_FORMAT) + timedelta(days=30 * months)).strftime(DATE_FORMAT)
+        expires = (datetime.strptime(user.expires, current_app.config['DATE_FORMAT']) + timedelta(days=30 * months)).strftime(current_app.config['DATE_FORMAT'])
     else:
-        expires = (datetime.utcnow() + timedelta(days=30 * months)).strftime(DATE_FORMAT)
+        expires = (datetime.utcnow() + timedelta(days=30 * months)).strftime(current_app.config['DATE_FORMAT'])
     user.update(subscribed=True, expires=expires)
     order.update(status='SUCCESS', merchant_id=merchant_id, operation_id=intid, email=p_email, phone=p_phone, currency_id=cur_id, payer_account=payer_account)
     return 'YES'
