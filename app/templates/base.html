@@ -52,6 +52,22 @@
             </a>
         </div>
       </div>
+      {% if current_user.is_authenticated and current_user.is_admin %}
+      <div class="item">
+        <div class="header">Админ</div>
+        <div class="menu">
+          <a class="item" href="{{ url_for('admin.orders') }}">
+            История операций
+          </a>
+          <a class="item" href="{{ url_for('admin.users') }}">
+            Пользователи
+          </a>
+          <a class="item" href="{{ url_for('admin.update') }}">
+            Обновление предметов
+          </a>
+        </div>
+      </div>
+      {% endif %}
       <div class="item">
         <div class="header">Аккаунт</div>
         <div class="menu">
@@ -132,6 +148,22 @@
                   </a>
               </div>
             </div>
+            {% if current_user.is_authenticated and current_user.is_admin %}
+            <div class="item">
+              <div class="header">Админ</div>
+              <div class="menu">
+                <a class="item" href="{{ url_for('admin.orders') }}">
+                  История операций
+                </a>
+                <a class="item" href="{{ url_for('admin.users') }}">
+                  Пользователи
+                </a>
+                <a class="item" href="{{ url_for('admin.update') }}">
+                  Обновление предметов
+                </a>
+              </div>
+            </div>
+            {% endif %}
             <div class="item">
               <div class="header">Аккаунт</div>
               <div class="menu">
@@ -269,6 +301,7 @@
         </div>
       </div>
     </div>
+    {% block scripts %}
     <!-- JQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <!-- Semantic UI -->
@@ -281,7 +314,6 @@
     <script src="/static/scripts/all.js"></script>
     <!-- Converter -->
     <script src="/static/scripts/converter.js"></script>
-    <!-- Table -->
-    <script src="/static/scripts/table.js"></script>
+    {% endblock %}
   </body>
 </html>

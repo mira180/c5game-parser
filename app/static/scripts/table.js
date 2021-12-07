@@ -40,6 +40,7 @@ $(function(){
       {"data": "Первая разница"},
       {"data": "Вторая разница"},
     ],
+    order: [[4, 'desc']],
     language: {
       emptyTable: "Нет данных в таблице",
       lengthMenu: "Показать _MENU_ предметов на странице",

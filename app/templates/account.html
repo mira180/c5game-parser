@@ -122,3 +122,9 @@
     </div>
   </div>
 {% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<!-- Payment -->
+<script src="/static/scripts/payment.js"></script>
+{% endblock %}

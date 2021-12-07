@@ -141,3 +141,9 @@
     </thead>
   </table>
 {% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<!-- Table -->
+<script src="/static/scripts/table.js"></script>
+{% endblock %}

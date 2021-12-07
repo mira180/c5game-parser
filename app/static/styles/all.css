@@ -170,13 +170,29 @@ td > .platforms img {
     width: 24px;
 }
 
-#table {
+#table, #orders_table, #users_table {
     width: 100% !important;
 }
 
 a.link {
     color: inherit;
     text-decoration: underline;
+}
+
+table .user {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    justify-content: center;
+}
+
+table .user img {
+    height: 40px;
+    width: 40px;
+}
+
+table .user span.steam_id {
+    color: rgb(175, 175, 175);
 }
 
 @media only screen and (max-width: 1272px) {

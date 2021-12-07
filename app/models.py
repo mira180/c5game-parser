@@ -1,5 +1,6 @@
 from flask_login import UserMixin
 from app import db, login
+from constants import Game
 
 class User(UserMixin, db.Document):
     steam_id = db.IntField()
@@ -10,10 +11,14 @@ class User(UserMixin, db.Document):
     expires = db.StringField()
     registered = db.StringField()
     last_seen = db.StringField()
+    is_admin = db.BooleanField(default=False)
+
+    def get_id(self):
+        return str(self.steam_id)
 
 @login.user_loader
-def load_user(id):
-    return User.objects(id=id).first()
+def load_user(steam_id):
+    return User.objects(steam_id=steam_id).first()
 
 class Platform(db.EmbeddedDocument):
     url = db.StringField()
@@ -23,10 +28,12 @@ class Platform(db.EmbeddedDocument):
     lowest_sell_order = db.FloatField()
     highest_buy_order = db.FloatField()
     sell_count = db.IntField()
+    image = db.StringField()
 
 class Item(db.Document):
-    steam = db.EmbeddedDocumentField(Platform)
-    c5game = db.EmbeddedDocumentField(Platform)
+    game = db.EnumField(Game)
+    STEAM = db.EmbeddedDocumentField(Platform)
+    C5GAME = db.EmbeddedDocumentField(Platform)
 
 class Order(db.Document):
     order_id = db.SequenceField()

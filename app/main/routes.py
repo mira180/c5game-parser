@@ -1,7 +1,7 @@
 from flask import render_template, redirect, request, jsonify
 from flask_login import login_required, current_user
 from app.main import bp
-from app.main.table import TableBuilder
+from app.tables import TableBuilder, ITEMS_TABLE_COLUMNS
 from app.main.conversion import ConversionRates
 
 import logging
@@ -12,7 +12,7 @@ from constants import Platform, Game, fee
 
 
 logger = logging.getLogger(__name__)
-table_builder = TableBuilder()
+table_builder = TableBuilder(ITEMS_TABLE_COLUMNS)
 conversion_rates = ConversionRates(EXCHANGER_API_KEY)
 db = Database()
 

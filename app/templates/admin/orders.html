@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block main %}
+<h2 class="ui dividing header">История операций</h2>
+<table class="ui basic table center aligned" id="orders_table">
+  <thead>
+    <tr>
+      <th>Пользователь</th>
+      <th>Номер заказа</th>
+      <th>Дата создания</th>
+      <th>Сумма</th>
+      <th>Статус</th>
+    </tr>
+  </thead>
+</table>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<!-- Admin -->
+<script src="/static/scripts/admin.js"></script>
+{% endblock %}

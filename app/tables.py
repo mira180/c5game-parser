@@ -1,5 +1,7 @@
+from flask import current_app
 import re
 from constants import price_re
+from datetime import datetime
 
 class ServerSideTable(object):
     '''
@@ -112,13 +114,17 @@ class ServerSideTable(object):
                 column_number = int(self.request_values['iSortCol_' + str(i)])
                 column_name = self.columns[column_number]['column_name']
                 sort_direction = self.request_values['sSortDir_' + str(i)]
-                if column_name == "Первая цена" or column_name == "Вторая цена":
+                if column_name in ["Первая цена", "Вторая цена"]:
                     data = sorted(data,
                                 key=lambda x: float(price_re.search(x[column_name]).group(1).replace('$', '')),
                                 reverse=is_reverse(sort_direction))
-                elif column_name == "Первая разница" or column_name == "Вторая разница":
+                elif column_name in ["Первая разница", "Вторая разница", "Сумма"]:
                     data = sorted(data,
-                                key=lambda x: float(x[column_name].replace('%', '')),
+                                key=lambda x: float(re.sub('[$%]', '', x[column_name])),
+                                reverse=is_reverse(sort_direction))
+                elif column_name in ["Дата создания", "Дата регистрации", "Последний визит"]:
+                    data = sorted(data,
+                                key=lambda x: datetime.strptime(x[column_name], current_app.config['DATE_FORMAT']),
                                 reverse=is_reverse(sort_direction))
                 else:
                     data = sorted(data,
@@ -182,3 +188,135 @@ class ServerSideTable(object):
         output['iTotalDisplayRecords'] = str(self.cardinality_filtered)
         output['data'] = self.result_data
         return output
+
+class TableBuilder(object):
+
+    def __init__(self, columns):
+        self.columns = columns
+
+    def collect_data_clientside(self, data):
+        return {'data': data}
+
+    def collect_data_serverside(self, request, data):
+        return ServerSideTable(request, data, self.columns).output_result()
+
+ITEMS_TABLE_COLUMNS = [
+    {
+        "data_name": "name",
+        "column_name": "Название предмета",
+        "default": "",
+        "order": 1,
+        "searchable": True
+    },
+    {
+        "data_name": "platforms",
+        "column_name": "Платформы",
+        "default": "",
+        "order": 2,
+        "searchable": False
+    },
+    {
+        "data_name": "first_price",
+        "column_name": "Первая цена",
+        "default": 0,
+        "order": 3,
+        "searchable": False
+    },
+    {
+        "data_name": "second_price",
+        "column_name": "Вторая цена",
+        "default": 0,
+        "order": 4,
+        "searchable": False
+    },
+    {
+        "data_name": "first_diff",
+        "column_name": "Первая разница",
+        "default": 0,
+        "order": 5,
+        "searchable": False
+    },
+    {
+        "data_name": "second_diff",
+        "column_name": "Вторая разница",
+        "default": 0,
+        "order": 6,
+        "searchable": False
+    }
+]
+
+ORDERS_TABLE_COLUMNS = [
+    {
+        "data_name": "user",
+        "column_name": "Пользователь",
+        "default": "",
+        "order": 1,
+        "searchable": True
+    },
+    {
+        "data_name": "order_id",
+        "column_name": "Номер заказа",
+        "default": "",
+        "order": 2,
+        "searchable": True
+    },
+    {
+        "data_name": "created",
+        "column_name": "Дата создания",
+        "default": "",
+        "order": 3,
+        "searchable": True
+    },
+    {
+        "data_name": "amount",
+        "column_name": "Сумма",
+        "default": "",
+        "order": 4,
+        "searchable": True
+    },
+    {
+        "data_name": "status",
+        "column_name": "Статус",
+        "default": "",
+        "order": 5,
+        "searchable": True
+    }
+]
+
+USERS_TABLE_COLUMNS = [
+    {
+        "data_name": "user",
+        "column_name": "Пользователь",
+        "default": "",
+        "order": 1,
+        "searchable": True
+    },
+    {
+        "data_name": "subscribed",
+        "column_name": "Подписка",
+        "default": "",
+        "order": 2,
+        "searchable": True
+    },
+    {
+        "data_name": "expires",
+        "column_name": "Подписка истекает",
+        "default": "",
+        "order": 3,
+        "searchable": True
+    },
+    {
+        "data_name": "registered",
+        "column_name": "Дата регистрации",
+        "default": "",
+        "order": 4,
+        "searchable": True
+    },
+    {
+        "data_name": "last_seen",
+        "column_name": "Последний визит",
+        "default": "",
+        "order": 5,
+        "searchable": True
+    }
+]
