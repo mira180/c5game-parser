@@ -67,6 +67,8 @@ def get_table():
                             }
                             if 'volume' in record[platform] and record[platform]['volume']:
                                 platform_['volume'] = record[platform]['volume']
+                            if 'median_price' in record[platform] and record[platform]['median_price']:
+                                platform_['median_price'] = record[platform]['median_price']
                             platforms_.append(platform_)
                         except:
                             pass
@@ -75,7 +77,10 @@ def get_table():
                 for platform in platforms_:
                     item['platforms'] += f'''<a href="{platform['url']}" class="ui image" data-platform="{platform['name']}"'''
                     if 'volume' in platform:
-                        item['platforms'] += f''' data-tooltip="{platform['volume']} продаж" data-inverted><div class="floating ui black label mini">{platform['volume']}</div'''
+                        item['platforms'] += f''' data-tooltip="{platform['volume']} продаж'''
+                        if 'median_price' in platform:
+                            item['platforms'] += f''' ~{platform['median_price']}$'''
+                        item['platforms'] += f'''" data-inverted><div class="floating ui black label mini">{platform['volume']}</div'''
                     item['platforms'] += f'''><img src="{platform['logo']}" style="width: 24px;"></a>'''
                 item['platforms'] += '''</div>'''
                 for idx, platform in enumerate([first_platform, second_platform]):
