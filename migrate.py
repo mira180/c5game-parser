@@ -1,20 +1,10 @@
 from db import Database
+from config import DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME, DB_AUTH_SOURCE
 
-db = Database()
-db_ = Database(db_name='c5game_parser')
+db = Database(db_name=DB_NAME)
+db_ = Database(uri=f'mongodb://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/?authSource={DB_AUTH_SOURCE}', db_name=DB_NAME)
 
-for item in db_.find('items', {}, multiple=True):
-    item_copy = item
-    if 'lowest_sell_order' in item['C5GAME']:
-        item['C5GAME']['lowest_sell_order'] = item['C5GAME']['lowest_sell_order']['usd']
-    if 'updated_at' in item['C5GAME']:
-        item['C5GAME']['updated'] = item['C5GAME']['updated_at']
-        del item['C5GAME']['updated_at']
-    if 'updated_at' in item['STEAM']:
-        item['STEAM']['updated'] = item['STEAM']['updated_at']
-        del item['STEAM']['updated_at']
-    item['STEAM'] = item['steam']
-    del item['STEAM']
-    item['C5GAME'] = item['c5game']
-    del item['C5GAME']
+print('start')
+for item in db.find('item', {}, multiple=True):
     db_.insert('item', item)
+print('end')

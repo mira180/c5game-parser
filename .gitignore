@@ -7,5 +7,6 @@ log.txt
 .flaskenv
 /db
 /webdriver
+/dump
 venv/
 __pycache__/

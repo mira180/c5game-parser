@@ -76,7 +76,7 @@ class SteamGetter(Getter):
             'lowest_sell_order': int(orders_histogram['lowest_sell_order']) / 100 if orders_histogram['lowest_sell_order'] else None,
             'highest_buy_order': int(orders_histogram['highest_buy_order']) / 100 if orders_histogram['highest_buy_order'] else None,
             'volume': int(re.sub('\D', '', price_overview['volume'])) if price_overview and 'volume' in price_overview else None,
-            'median_price': float(re.sub('\D', '', price_overview['median_price'])) if price_overview and 'median_price' in price_overview else None
+            'median_price': float(re.sub('\$', '', price_overview['median_price'])) if price_overview and 'median_price' in price_overview else None
         }
         return updated
         
