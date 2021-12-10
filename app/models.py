@@ -23,12 +23,13 @@ def load_user(steam_id):
 class Platform(db.EmbeddedDocument):
     url = db.StringField()
     name = db.StringField()
-    updated_at = db.StringField()
+    updated = db.StringField()
     volume = db.IntField()
     lowest_sell_order = db.FloatField()
     highest_buy_order = db.FloatField()
     sell_count = db.IntField()
     image = db.StringField()
+    median_price = db.FloatField()
 
 class Item(db.Document):
     game = db.EnumField(Game)

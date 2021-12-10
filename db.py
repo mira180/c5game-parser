@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 class Database:
 
     def __init__(self, uri='mongodb://localhost:27017', db_name='test'):
-        logger.info(f'Подключение к базе данных: {uri}')
+        #logger.info(f'Подключение к базе данных: {uri}')
         client = pymongo.MongoClient(uri)
         self.db = client[db_name]
         
@@ -14,7 +14,7 @@ class Database:
         """
         Добавление новой записи в коллекцию
         """
-        logger.debug(f'Добавление новой записи в коллекцию {collection_name}: {data}')
+        #logger.debug(f'Добавление новой записи в коллекцию {collection_name}: {data}')
         collection = self.db[collection_name]
         return collection.insert_one(data).inserted_id
     
@@ -22,7 +22,7 @@ class Database:
         """
         Поиск по коллекции
         """
-        logger.debug(f'Поиск в коллекции {collection_name} по фильтру: {elements}')
+        #logger.debug(f'Поиск в коллекции {collection_name} по фильтру: {elements}')
         collection = self.db[collection_name]
         if multiple:
             results = collection.find(elements)
@@ -34,7 +34,7 @@ class Database:
         """
         Изменение записи в коллекции
         """
-        logger.debug(f'Изменение записи в коллекции {collection_name}, где {query_elements} -> {new_values}')
+        #logger.debug(f'Изменение записи в коллекции {collection_name}, где {query_elements} -> {new_values}')
         collection = self.db[collection_name]
         collection.update_one(query_elements, {'$set': new_values})
 
@@ -42,6 +42,6 @@ class Database:
         """
         Удаление записи из коллекции
         """
-        logger.debug(f'Удаление записи в коллекции {collection_name} по фильтру: {query}')
+        #logger.debug(f'Удаление записи в коллекции {collection_name} по фильтру: {query}')
         collection = self.db[collection_name]
         collection.delete_one(query)

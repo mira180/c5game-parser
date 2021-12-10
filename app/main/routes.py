@@ -1,27 +1,25 @@
-from flask import render_template, redirect, request, jsonify
+from flask import render_template, redirect, request, jsonify, current_app
 from flask_login import login_required, current_user
 from app.main import bp
 from app.tables import TableBuilder, ITEMS_TABLE_COLUMNS
 from app.main.conversion import ConversionRates
-
 import logging
 from datetime import datetime
 from db import Database
-from config import ITEMS_COLLECTION, EXCHANGER_API_KEY, DATE_FORMAT
+from config import DB_NAME, EXCHANGER_API_KEY
 from constants import Platform, Game, fee
-
 
 logger = logging.getLogger(__name__)
 table_builder = TableBuilder(ITEMS_TABLE_COLUMNS)
 conversion_rates = ConversionRates(EXCHANGER_API_KEY)
-db = Database()
+db = Database(db_name=DB_NAME)
 
 
 @bp.before_request
 def before_request():
     if current_user.is_authenticated:
-        current_user.last_seen = datetime.utcnow().strftime(DATE_FORMAT)
-        if current_user.subscribed and datetime.strptime(current_user.expires, DATE_FORMAT) < datetime.utcnow():
+        current_user.last_seen = datetime.utcnow().strftime(current_app.config['DATE_FORMAT'])
+        if current_user.subscribed and datetime.strptime(current_user.expires, current_app.config['DATE_FORMAT']) < datetime.utcnow():
             current_user.subscribed = False
         current_user.save()
 
@@ -54,7 +52,7 @@ def get_table():
     subscribed = current_user.is_authenticated and current_user.subscribed
     game = request.args.get('game', '')
     if game in games and first_platform in platforms and second_platform in platforms:
-        for record in db.find(ITEMS_COLLECTION, {'game': game, first_platform: {'$exists': True}, second_platform: {'$exists': True}}, multiple=True):
+        for record in db.find('item', {'game': game, first_platform: {'$exists': True}, second_platform: {'$exists': True}}, multiple=True):
             try:
                 item = {}
                 item['name'] = record[Platform.STEAM.name]['name']
@@ -67,7 +65,7 @@ def get_table():
                                 'logo': f'/static/images/{platform}_logo.png',
                                 'url': record[platform]['url']
                             }
-                            if 'volume' in record[platform]:
+                            if 'volume' in record[platform] and record[platform]['volume']:
                                 platform_['volume'] = record[platform]['volume']
                             platforms_.append(platform_)
                         except:
@@ -87,7 +85,7 @@ def get_table():
                     autobuy = True if [first_autobuy, second_autobuy][idx] == 'true' else False
                     if platform == Platform.C5GAME.name:
                         if not autobuy:
-                            item[price] = record[platform]['lowest_sell_order']['usd']
+                            item[price] = record[platform]['lowest_sell_order']
                         else:
                             raise Exception("Автопокупка не доступна для платформы")
                     elif platform == Platform.STEAM.name:
@@ -95,9 +93,9 @@ def get_table():
                             item[price] = record[platform]['lowest_sell_order']
                         else:
                             item[price] = record[platform]['highest_buy_order']
-                        if 'volume' in record[platform]:
+                        if 'volume' in record[platform] and record[platform]['volume']:
                             item[volume] = record[platform]['volume']
-                    item[updated] = record[platform]['updated_at']
+                    item[updated] = record[platform]['updated']
                 item['first_diff'] = round((item['second_price'] / fee[second_platform][game] / item['first_price'] - 1) * 100, 2)
                 item['second_diff'] = round((item['first_price'] / fee[first_platform][game] / item['second_price'] - 1) * 100, 2)
                 if not subscribed:

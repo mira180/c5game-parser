@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block main %}
+<h2 class="ui dividing header">Статистика обновлений</h2>
+<h4>Текущее обновление</h4>
+<table class="ui celled table">
+  <thead>
+    <tr>
+      <th>Платформа</th>
+      <th>Начало обновления (UTC)</th>
+      <th>Успешно</th>
+      <th>С ошибками</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if 'STEAM' in statistics %}
+    <tr>
+      <td>STEAM</td>
+      <td>{{ statistics['STEAM']['started'] }}</td>
+      <td>{{ statistics['STEAM']['success'] }}</td>
+      <td>{{ statistics['STEAM']['errors'] }}</td>
+    </tr>
+    {% endif %}
+    {% if 'C5GAME' in statistics %}
+    <tr>
+      <td>C5GAME</td>
+      <td>{{ statistics['C5GAME']['started'] }}</td>
+      <td>{{ statistics['C5GAME']['success'] }}</td>
+      <td>{{ statistics['C5GAME']['errors'] }}</td>
+    </tr>
+    {% endif %}
+  </tbody>
+</table>
+{% if last_statistics %}
+<h4>Последнее обновление</h4>
+<table class="ui celled table">
+  <thead>
+    <tr>
+      <th>Платформа</th>
+      <th>Начало обновления (UTC)</th>
+      <th>Конец обновления (UTC)</th>
+      <th>Успешно</th>
+      <th>С ошибками</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if 'STEAM' in last_statistics %}
+    <tr>
+      <td>STEAM</td>
+      <td>{{ last_statistics['STEAM']['started'] }}</td>
+      <td>{{ last_statistics['STEAM']['ended'] }}</td>
+      <td>{{ last_statistics['STEAM']['success'] }}</td>
+      <td>{{ last_statistics['STEAM']['errors'] }}</td>
+    </tr>
+    {% endif %}
+    {% if 'C5GAME' in last_statistics %}
+    <tr>
+      <td>C5GAME</td>
+      <td>{{ last_statistics['C5GAME']['started'] }}</td>
+      <td>{{ last_statistics['C5GAME']['ended'] }}</td>
+      <td>{{ last_statistics['C5GAME']['success'] }}</td>
+      <td>{{ last_statistics['C5GAME']['errors'] }}</td>
+    </tr>
+    {% endif %}
+  </tbody>
+</table>
+{% endif %}
+{% endblock %}

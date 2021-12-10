@@ -2,7 +2,7 @@ $.fn.DataTable.ext.pager.numbers_length = 5;
 
 $(function(){
 
-  var orders_table = $('#orders_table').DataTable({
+  $('#orders_table').DataTable({
     bProcessing: true,
     bServerSide: true,
     lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
@@ -43,7 +43,7 @@ $(function(){
     }
   });
 
-  var users_table = $('#users_table').DataTable({
+  $('#users_table').DataTable({
     bProcessing: true,
     bServerSide: true,
     lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],

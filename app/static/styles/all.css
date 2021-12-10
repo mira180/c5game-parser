@@ -195,6 +195,10 @@ table .user span.steam_id {
     color: rgb(175, 175, 175);
 }
 
+button.fluid {
+    height: 100%;
+}
+
 @media only screen and (max-width: 1272px) {
     .masthead > .container, .main.container, .fixed.menu > .container {
         margin-left: 2rem !important;
