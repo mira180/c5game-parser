@@ -4,15 +4,11 @@ from app.admin import bp
 from functools import wraps
 from app.models import Order, User
 from app.tables import TableBuilder, ORDERS_TABLE_COLUMNS, USERS_TABLE_COLUMNS
-from app.getter import Updater
 from datetime import datetime, timedelta
-from constants import Platform
-from config import UPDATE_INTERVAL, UPDATE_THREADS
+from app.admin.statistics import get_statistics_from_updater
 
 orders_table_builder = TableBuilder(ORDERS_TABLE_COLUMNS)
 users_table_builder = TableBuilder(USERS_TABLE_COLUMNS)
-updater = Updater([Platform.STEAM, Platform.C5GAME], threads=UPDATE_THREADS, interval=UPDATE_INTERVAL)
-updater.start()
 
 def admin_required(f):
     @wraps(f)
@@ -87,7 +83,8 @@ def user(steam_id):
 @login_required
 @admin_required
 def update():
-    return render_template('admin/update.html', statistics=updater.statistics, last_statistics=updater.last_statistics)
+    statistics, last_statistics = get_statistics_from_updater()
+    return render_template('admin/update.html', statistics=statistics, last_statistics=last_statistics)
 
 @bp.route('/control')
 @login_required
