@@ -28,6 +28,9 @@ elif platform == 'linux':
 DB_NAME = os.getenv('DB_NAME', 'c5game_parser')
 DB_HOST = os.getenv('DB_HOST', 'localhost')
 DB_PORT = int(os.getenv('DB_PORT', '27017'))
+DB_USERNAME = os.getenv('DB_USERNAME', '')
+DB_PASSWORD = os.getenv('DB_PASSWORD', '')
+DB_AUTH_SOURCE = os.getenv('DB_AUTH_SOURCE', 'admin')
 DATE_FORMAT = os.getenv('DATE_FORMAT', r'%Y-%m-%d %H:%M:%S')
 EXCHANGER_API_KEY = os.getenv('EXCHANGER_API_KEY')
 STEAM_API_KEY = os.getenv('STEAM_API_KEY')
@@ -40,7 +43,10 @@ class FlaskConfig(object):
     MONGODB_SETTINGS = {
         'db': DB_NAME,
         'host': DB_HOST,
-        'port': DB_PORT
+        'port': DB_PORT,
+        'username': DB_USERNAME,
+        'password': DB_PASSWORD,
+        'authentication_source': DB_AUTH_SOURCE
     }
     MERCHANT_ID = int(os.getenv('MERCHANT_ID'))
     MERCHANT_SECRET_1 = os.getenv('MERCHANT_SECRET_1')

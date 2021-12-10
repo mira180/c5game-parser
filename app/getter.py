@@ -9,11 +9,11 @@ import urllib.parse
 import time
 import queue
 from db import Database
-from config import DATE_FORMAT, DB_NAME
+from config import DATE_FORMAT, DB_AUTH_SOURCE, DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME
 import random
 
 logger = logging.getLogger(__name__)
-db = Database(db_name=DB_NAME)
+db = Database(uri=f'mongodb://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/?authSource={DB_AUTH_SOURCE}', db_name=DB_NAME)
 
 class Proxy(object):
 

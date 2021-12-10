@@ -6,13 +6,13 @@ from app.main.conversion import ConversionRates
 import logging
 from datetime import datetime
 from db import Database
-from config import DB_NAME, EXCHANGER_API_KEY
+from config import DB_AUTH_SOURCE, DB_NAME, DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, EXCHANGER_API_KEY
 from constants import Platform, Game, fee
 
 logger = logging.getLogger(__name__)
 table_builder = TableBuilder(ITEMS_TABLE_COLUMNS)
 conversion_rates = ConversionRates(EXCHANGER_API_KEY)
-db = Database(db_name=DB_NAME)
+db = Database(uri=f'mongodb://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/?authSource={DB_AUTH_SOURCE}', db_name=DB_NAME)
 
 
 @bp.before_request
