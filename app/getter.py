@@ -184,4 +184,4 @@ class Updater:
             self.statistics[platform.name]['ended'] = datetime.utcnow().strftime(DATE_FORMAT)
             self.last_statistics[platform.name] = self.statistics[platform.name]
             logger.debug(f"Сделали полный круг обновления: {platform.name}")
-            logger.debug(f"Статистика для {platform.name}: {self.statistics[platform.name]['errors']} ошибок, {self.statistics[platform.name]['success']} успешно, заняло {self.last_statistics[platform.name]['passed'] / 60} мин.")
+            logger.debug(f"Статистика для {platform.name}: {self.statistics[platform.name]['errors']} ошибок, {self.statistics[platform.name]['success']} успешно")
