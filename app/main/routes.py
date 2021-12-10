@@ -255,3 +255,7 @@ def account():
 @bp.route('/get_conversion_rates')
 def get_conversion_rates():
     return conversion_rates.get()
+
+@bp.route('/faq')
+def faq():
+    return render_template('faq.html')
