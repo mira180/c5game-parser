@@ -1,6 +1,7 @@
 var short_names = {
   'C5GAME': 'C5',
   'STEAM': 'ST',
+  'MARKETTM': 'TM',
 };
 
 $.fn.DataTable.ext.pager.numbers_length = 5;

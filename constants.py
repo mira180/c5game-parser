@@ -12,7 +12,8 @@ class Game(Enum):
 
 class Platform(Enum):
     C5GAME = 0
-    STEAM = 1
+    MARKETTM = 1
+    STEAM = 2
 
 fee = {
     Platform.C5GAME.name: {
@@ -28,6 +29,15 @@ fee = {
         Game.DOTA.name: 1.15,
         Game.CSGO.name: 1.15,
         Game.TF2.name: 1.10,
+        Game.Z1.name: 1,
+        Game.RUST.name: 1,
+        Game.STEAM.name: 1,
+        Game.PAYDAY2.name: 1
+    },
+    Platform.MARKETTM.name: {
+        Game.DOTA.name: 1,
+        Game.CSGO.name: 1,
+        Game.TF2.name: 1,
         Game.Z1.name: 1,
         Game.RUST.name: 1,
         Game.STEAM.name: 1,

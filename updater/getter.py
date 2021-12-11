@@ -10,21 +10,10 @@ import time
 import queue
 from db import Database
 from config import DATE_FORMAT, DB_AUTH_SOURCE, DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME
-import random
+from proxy import Proxy
 
 logger = logging.getLogger(__name__)
 db = Database(uri=f'mongodb://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/?authSource={DB_AUTH_SOURCE}', db_name=DB_NAME)
-
-class Proxy(object):
-
-    def __init__(self, proxy_file='proxy.txt'):
-        self.proxies = [l.strip() for l in open(proxy_file)]
-
-    def get(self):
-        #logger.debug(f"Получаем прокси, current_time: {current_time}")
-        proxy = random.choice(self.proxies)
-        logger.debug(f"Нашли свободный прокси {proxy}")
-        return { 'http': proxy, 'https': proxy }
 
 class Getter(object):
 
