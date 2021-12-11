@@ -1,4 +1,4 @@
-from flask import render_template, redirect, request, jsonify, current_app
+from flask import render_template, redirect, request, jsonify, current_app, send_from_directory
 from flask_login import login_required, current_user
 from app.main import bp
 from app.tables import TableBuilder, ITEMS_TABLE_COLUMNS
@@ -259,3 +259,7 @@ def get_conversion_rates():
 @bp.route('/faq')
 def faq():
     return render_template('faq.html')
+
+@bp.route('/yandex_8adb127719cdca8a.html')
+def static_from_root():
+    return send_from_directory('static', request.path[1:])
